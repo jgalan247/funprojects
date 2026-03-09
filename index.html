@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shark Attack! — Scratch Game Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="seabed"></div>
+<!-- SCHOOL BADGE -->
+<div class="school-badge">
+  <span class="sb-icon">🏫</span>
+  <div class="sb-text">
+    <span class="sb-name">Haute Vallée School</span>
+    <span class="sb-sub">Computer Science</span>
+  </div>
+</div>
+
+<div class="bubbles">
+  <div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div>
+  <div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div>
+  <div class="b"></div><div class="b"></div>
+</div>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-tag">Year 7 · Scratch 3.0 · 6 Lessons · 1 Hour Each</div>
+  <span class="hero-shark">🦈</span>
+  <h1>Shark Attack!</h1>
+  <p class="hero-desc">Build a complete ocean survival game — with enemies, power-ups, health bars, multiple levels, and changing seabeds. Real programming concepts, real fun.</p>
+  <div class="hero-pills">
+    <span class="pill">🎮 Full Game Project</span>
+    <span class="pill">📦 8 Variables</span>
+    <span class="pill">🧩 6 Custom Functions</span>
+    <span class="pill">🌊 6 Changing Levels</span>
+    <span class="pill">☠️ 5 Types of Hazard</span>
+  </div>
+</header>
+
+<!-- VARIABLE DASHBOARD -->
+<section class="var-dashboard">
+  <div class="var-title">🗂️ Variables You'll Build in This Game</div>
+  <div class="var-grid">
+    <div class="var-card vc-score">
+      <div class="var-card-icon">⭐</div>
+      <div class="var-card-name">Variable</div>
+      <div class="var-card-type">Score</div>
+      <div class="var-card-desc">Increases each time a fish is caught. Different fish = different points.</div>
+    </div>
+    <div class="var-card vc-lives">
+      <div class="var-card-icon">❤️</div>
+      <div class="var-card-name">Variable</div>
+      <div class="var-card-type">Lives</div>
+      <div class="var-card-desc">Starts at 3. Lost when fish escape or enemies hit the shark.</div>
+    </div>
+    <div class="var-card vc-health">
+      <div class="var-card-icon">💚</div>
+      <div class="var-card-name">Variable</div>
+      <div class="var-card-type">Health</div>
+      <div class="var-card-desc">0–100. Drains when touching jellyfish or mines. Recharges per level.</div>
+    </div>
+    <div class="var-card vc-level">
+      <div class="var-card-icon">🌊</div>
+      <div class="var-card-name">Variable</div>
+      <div class="var-card-type">Level</div>
+      <div class="var-card-desc">1–6. Each level changes the background, speed, and enemies.</div>
+    </div>
+    <div class="var-card vc-speed">
+      <div class="var-card-icon">⚡</div>
+      <div class="var-card-name">Variable</div>
+      <div class="var-card-type">FishSpeed</div>
+      <div class="var-card-desc">How fast fish swim. Increases each level. Used in spawnFish.</div>
+    </div>
+    <div class="var-card vc-hiscore">
+      <div class="var-card-icon">🏆</div>
+      <div class="var-card-name">Variable</div>
+      <div class="var-card-type">HiScore</div>
+      <div class="var-card-desc">Stores the best score across all games. Never resets with Score.</div>
+    </div>
+    <div class="var-card vc-timer">
+      <div class="var-card-icon">⏱️</div>
+      <div class="var-card-name">Variable</div>
+      <div class="var-card-type">TimeBonus</div>
+      <div class="var-card-desc">Countdown per level. Finish fast = bonus points added to Score.</div>
+    </div>
+    <div class="var-card vc-poison">
+      <div class="var-card-icon">☠️</div>
+      <div class="var-card-name">Variable</div>
+      <div class="var-card-type">PoisonActive</div>
+      <div class="var-card-desc">Boolean (0 or 1). Tracks if shark is currently poisoned by a pufferfish.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PROGRESS NAV -->
+<nav class="progress-nav">
+  <div class="progress-inner">
+    <div class="pstep" onclick="go(1)"><div class="pdot">1</div><div class="plabel">Shark & Score</div></div>
+    <div class="pline"></div>
+    <div class="pstep" onclick="go(2)"><div class="pdot">2</div><div class="plabel">Fish & Clones</div></div>
+    <div class="pline"></div>
+    <div class="pstep" onclick="go(3)"><div class="pdot">3</div><div class="plabel">Functions</div></div>
+    <div class="pline"></div>
+    <div class="pstep" onclick="go(4)"><div class="pdot">4</div><div class="plabel">Enemies & Health</div></div>
+    <div class="pline"></div>
+    <div class="pstep" onclick="go(5)"><div class="pdot">5</div><div class="plabel">Levels</div></div>
+    <div class="pline"></div>
+    <div class="pstep" onclick="go(6)"><div class="pdot">6</div><div class="plabel">Polish & Share</div></div>
+  </div>
+</nav>
+
+<main class="container">
+
+<!-- ╔══════════════════════════════════╗ -->
+<!-- ║         LESSON  1               ║ -->
+<!-- ╚══════════════════════════════════╝ -->
+<article class="lesson l1" id="l1">
+  <div class="lesson-hdr" onclick="go(1)">
+    <div class="lnum">01</div>
+    <div class="ltxt">
+      <div class="ltag">Lesson 1 · Sprites, Motion, Variables</div>
+      <div class="ltitle">Meet Your Shark 🦈</div>
+      <div class="lsub">Stage setup · Arrow key movement · Score, Lives, Health variables · HUD display</div>
+    </div>
+    <div class="lemoji">🌊</div>
+    <div class="lchev">▼</div>
+  </div>
+  <div class="lbody">
+    <div class="obj">
+      <strong>By the end of Lesson 1</strong> you'll have an ocean scene, a shark that moves smoothly in all four directions, and a working HUD (heads-up display) showing Score, Lives, and Health on screen. You'll understand what variables are and why games need them.
+    </div>
+
+    <div class="slabel">Part 1 — Setting Up the Ocean</div>
+    <ul class="steps">
+      <li><div class="sc"><strong>Open Scratch</strong><span>Go to <em>scratch.mit.edu</em> → Click <strong>Create</strong>. You'll see: the Stage (your game window, 480×360 pixels), the Sprite List, and the Code Blocks on the left.</span></div></li>
+      <li><div class="sc"><strong>Add your first backdrop — Shallow Water</strong><span>Click the <strong>Stage</strong> thumbnail (bottom-right) → <em>Choose a Backdrop</em> → search "Underwater 1". This will be your Level 1 background. Later you'll add more backdrops for higher levels.</span></div></li>
+      <li><div class="sc"><strong>Delete the cat, add a Shark</strong><span>Right-click the cat → <em>Delete</em>. Click <em>Choose a Sprite</em> → search <strong>Shark</strong>. If you can't find one, use <em>Paint</em> to draw a simple shark shape. Resize it so it fits comfortably on the stage (try 80px wide).</span></div></li>
+      <li><div class="sc"><strong>Position the shark at the centre-left</strong><span>Drag the shark to around x: -150, y: 0 on the stage. This will be its start position.</span></div></li>
+    </ul>
+
+    <div class="concept">
+      <div class="concept-title">🧠 Key Concept: The Coordinate System</div>
+      <p>Scratch uses X and Y coordinates. The centre of the stage is (0, 0). X goes from -240 (left edge) to +240 (right edge). Y goes from -180 (bottom) to +180 (top). Every sprite has an X and Y position at all times.</p>
+    </div>
+
+    <div class="slabel">Part 2 — Moving the Shark</div>
+    <ul class="steps">
+      <li><div class="sc"><strong>Click on the Shark sprite — all code goes here</strong><span>Make sure the shark is highlighted in the sprite list before dragging blocks.</span></div></li>
+      <li>
+        <div class="sc">
+          <strong>Build the movement code:</strong>
+          <div class="sblocks">
+            <div class="sb sb-hat">🚩 when Green Flag clicked</div>
+            <div class="sb sb-mot i1">go to x: (-150) y: (0)</div>
+            <div class="sb sb-ctrl i1">forever</div>
+            <div class="sb sb-evt i2">if &lt;key [right arrow ▼] pressed?&gt; then</div>
+            <div class="sb sb-mot i3">change x by (6)</div>
+            <div class="sb sb-look i3">point in direction (90)</div>
+            <div class="sb sb-evt i2">if &lt;key [left arrow ▼] pressed?&gt; then</div>
+            <div class="sb sb-mot i3">change x by (-6)</div>
+            <div class="sb sb-look i3">point in direction (-90)</div>
+            <div class="sb sb-evt i2">if &lt;key [up arrow ▼] pressed?&gt; then</div>
+            <div class="sb sb-mot i3">change y by (5)</div>
+            <div class="sb sb-evt i2">if &lt;key [down arrow ▼] pressed?&gt; then</div>
+            <div class="sb sb-mot i3">change y by (-5)</div>
+          </div>
+          <span>Press the green flag and test it. The shark should move in all 4 directions.</span>
+        </div>
+      </li>
+      <li><div class="sc"><strong>Keep the shark inside the stage</strong><span>Add this inside the forever loop to stop the shark going off-screen:</span>
+        <div class="sblocks">
+          <div class="sb sb-mot i2">if on edge, bounce</div>
+        </div>
+        <span>Or for more control, use: <code>if x position &gt; 230 → set x to 230</code> (repeat for all 4 edges).</span>
+      </div></li>
+    </ul>
+    <div class="tip">The <strong>forever</strong> loop runs 30 times per second. Each time it checks: "is a key being pressed?" This is called a <em>polling loop</em> — the same technique used in real game engines.</div>
+
+    <div class="slabel">Part 3 — Creating All Your Variables</div>
+    <p style="color:var(--dim);font-size:0.88rem;line-height:1.7;margin-bottom:12px;">Now we'll create all the variables the game will need. Go to <strong>Variables</strong> → <em>Make a Variable</em> for each one. Set them all to "For all sprites".</p>
+    <table class="var-table">
+      <tr><th>Variable Name</th><th>Type</th><th>Starting Value</th><th>Purpose</th></tr>
+      <tr><td class="vname">Score</td><td><span class="vtype t-num">Number</span></td><td>0</td><td>Points earned by catching fish</td></tr>
+      <tr><td class="vname">HiScore</td><td><span class="vtype t-num">Number</span></td><td>0</td><td>Best score ever — survives between games</td></tr>
+      <tr><td class="vname">Lives</td><td><span class="vtype t-num">Number</span></td><td>3</td><td>Lives remaining — lose all = Game Over</td></tr>
+      <tr><td class="vname">Health</td><td><span class="vtype t-num">Number</span></td><td>100</td><td>Hit points — drains from hazards</td></tr>
+      <tr><td class="vname">Level</td><td><span class="vtype t-num">Number</span></td><td>1</td><td>Current level (1–6)</td></tr>
+      <tr><td class="vname">FishSpeed</td><td><span class="vtype t-num">Number</span></td><td>3</td><td>How fast fish move across the screen</td></tr>
+      <tr><td class="vname">TimeBonus</td><td><span class="vtype t-num">Number</span></td><td>30</td><td>Seconds left in the level — becomes bonus points</td></tr>
+      <tr><td class="vname">PoisonActive</td><td><span class="vtype t-bool">Boolean</span></td><td>0</td><td>1 = shark is poisoned, 0 = shark is fine</td></tr>
+    </table>
+
+    <div class="slabel">Part 4 — The startGame Function (Preview)</div>
+    <ul class="steps">
+      <li><div class="sc"><strong>Set all starting values when the green flag is clicked</strong><span>Add these at the top of your shark's green flag script, above the forever loop:</span>
+        <div class="sblocks">
+          <div class="sb sb-var i1">set [Score ▼] to (0)</div>
+          <div class="sb sb-var i1">set [Lives ▼] to (3)</div>
+          <div class="sb sb-var i1">set [Health ▼] to (100)</div>
+          <div class="sb sb-var i1">set [Level ▼] to (1)</div>
+          <div class="sb sb-var i1">set [FishSpeed ▼] to (3)</div>
+          <div class="sb sb-var i1">set [TimeBonus ▼] to (30)</div>
+          <div class="sb sb-var i1">set [PoisonActive ▼] to (0)</div>
+        </div>
+        <span>In Lesson 3 we'll move all of this into a proper named function called <code>startGame</code>.</span>
+      </div></li>
+    </ul>
+
+    <div class="slabel">Part 5 — HUD: Showing Variables on Screen</div>
+    <ul class="steps">
+      <li><div class="sc"><strong>Show Score, Lives and Health on screen</strong><span>Tick the checkbox next to each variable in the Variables palette. They appear as monitors on the stage. Drag them to neat positions — Score top-left, Lives top-centre, Health top-right.</span></div></li>
+      <li><div class="sc"><strong>Hide FishSpeed, PoisonActive, Level from the player</strong><span>Untick those checkboxes — the player doesn't need to see those. Or right-click a monitor and choose <em>hide</em>.</span></div></li>
+    </ul>
+    <div class="tip">In a real game you'd build a custom health bar sprite. For now the variable monitor is fine — we'll polish it in Lesson 6.</div>
+
+    <div class="chal">
+      <div class="chal-title">🔥 Extension Challenge</div>
+      <p>Make the shark animate as it swims. In the <strong>Costumes</strong> tab, duplicate the shark costume and slightly move the tail fin. Then add <code>next costume</code> inside a <code>wait 0.15 seconds</code> loop running alongside your movement code.</p>
+    </div>
+
+    <div class="slabel">✅ Lesson 1 Checklist</div>
+    <ul class="checklist">
+      <li>Ocean backdrop is displayed</li>
+      <li>Shark sprite moves with all 4 arrow keys</li>
+      <li>Shark stays within the stage edges</li>
+      <li>All 8 variables are created</li>
+      <li>Score, Lives and Health show on screen</li>
+      <li>All values reset correctly when green flag is clicked</li>
+      <li>You can explain: what a variable is, what a coordinate is, what a forever loop does</li>
+    </ul>
+  </div>
+</article>
+
+<!-- ╔══════════════════════════════════╗ -->
+<!-- ║         LESSON  2               ║ -->
+<!-- ╚══════════════════════════════════╝ -->
+<article class="lesson l2" id="l2">
+  <div class="lesson-hdr" onclick="go(2)">
+    <div class="lnum">02</div>
+    <div class="ltxt">
+      <div class="ltag">Lesson 2 · Clones, Loops & Conditionals</div>
+      <div class="ltitle">Release the Fish! 🐟</div>
+      <div class="lsub">Clones · Random spawning · Collision detection · Multi-value fish</div>
+    </div>
+    <div class="lemoji">🐠</div>
+    <div class="lchev">▼</div>
+  </div>
+  <div class="lbody">
+    <div class="obj">
+      <strong>By the end of Lesson 2</strong> your game will have multiple types of fish spawning from the right side. Catching them adds to the score (different fish = different points). Missing them costs a life. A golden fish appears rarely for bonus points.
+    </div>
+
+    <div class="slabel">Part 1 — Add Three Fish Sprites</div>
+    <ul class="steps">
+      <li><div class="sc"><strong>Add a regular fish</strong><span>Click <em>Choose a Sprite</em> → search <strong>Fish</strong>. Pick one and rename it "Fish" in the sprite info panel. Resize it to about 50px wide.</span></div></li>
+      <li><div class="sc"><strong>Add a second fish — the Bonus Fish</strong><span>Add another fish sprite. Rename it "GoldFish". Change its colour in the <strong>Costumes</strong> tab — select the fish shape and use the fill tool to make it golden/yellow. This fish will be worth 3 points.</span></div></li>
+      <li><div class="sc"><strong>Add a third fish — the Speed Fish</strong><span>Add a third fish sprite, rename it "FastFish". Make it a bright red/pink colour. This fish moves fast but is only worth 1 point.</span></div></li>
+    </ul>
+
+    <div class="concept">
+      <div class="concept-title">🧠 Key Concept: Clones</div>
+      <p>A <strong>clone</strong> is a temporary copy of a sprite. The original sprite hides itself and acts as a factory — it produces clones over and over. Each clone runs its own code, moves independently, and can delete itself. This lets you have many fish on screen without needing many sprites.</p>
+    </div>
+
+    <div class="slabel">Part 2 — Regular Fish Clone System</div>
+    <ul class="steps">
+      <li>
+        <div class="sc">
+          <strong>Green flag script — the factory</strong>
+          <div class="sblocks">
+            <div class="sb sb-hat">🚩 when Green Flag clicked</div>
+            <div class="sb sb-look i1">hide</div>
+            <div class="sb sb-ctrl i1">forever</div>
+            <div class="sb sb-ctrl i2">create clone of [myself ▼]</div>
+            <div class="sb sb-ctrl i2">wait (pick random (1) to (3)) seconds</div>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="sc">
+          <strong>Clone startup script — each fish behaves on its own</strong>
+          <div class="sblocks">
+            <div class="sb sb-hat">when I start as a clone</div>
+            <div class="sb sb-look i1">show</div>
+            <div class="sb sb-mot i1">go to x: (240) y: (pick random (-160) to (160))</div>
+            <div class="sb sb-look i1">set size to (pick random (60) to (100))%</div>
+            <div class="sb sb-ctrl i1">forever</div>
+            <div class="sb sb-mot i2">change x by ((0) - (FishSpeed))</div>
+            <div class="sb sb-evt i2">if &lt;touching [Shark ▼]?&gt; then</div>
+            <div class="sb sb-var i3">change [Score ▼] by (1)</div>
+            <div class="sb sb-snd i3">play sound [Pop ▼]</div>
+            <div class="sb sb-ctrl i3">delete this clone</div>
+            <div class="sb sb-evt i2">if &lt;(x position) &lt; (-240)&gt; then</div>
+            <div class="sb sb-var i3">change [Lives ▼] by (-1)</div>
+            <div class="sb sb-ctrl i3">delete this clone</div>
+          </div>
+        </div>
+      </li>
+    </ul>
+    <div class="tip">Using <code>pick random</code> for both the Y position and size makes each fish feel unique. Varying size also adds an illusion of depth — bigger fish look closer.</div>
+
+    <div class="slabel">Part 3 — Golden Fish (3 points, rare)</div>
+    <ul class="steps">
+      <li>
+        <div class="sc">
+          <strong>GoldFish spawns less often and is worth more</strong>
+          <div class="sblocks">
+            <div class="sb sb-hat">🚩 when Green Flag clicked</div>
+            <div class="sb sb-look i1">hide</div>
+            <div class="sb sb-ctrl i1">forever</div>
+            <div class="sb sb-ctrl i2">create clone of [myself ▼]</div>
+            <div class="sb sb-ctrl i2">wait (pick random (5) to (10)) seconds</div>
+          </div>
+          <br/>
+          <div class="sblocks">
+            <div class="sb sb-hat">when I start as a clone</div>
+            <div class="sb sb-look i1">show</div>
+            <div class="sb sb-mot i1">go to x: (240) y: (pick random (-150) to (150))</div>
+            <div class="sb sb-ctrl i1">forever</div>
+            <div class="sb sb-mot i2">change x by ((0) - (FishSpeed))</div>
+            <div class="sb sb-mot i2">change y by (pick random (-2) to (2))</div>
+            <div class="sb sb-evt i2">if &lt;touching [Shark ▼]?&gt; then</div>
+            <div class="sb sb-var i3">change [Score ▼] by (3)</div>
+            <div class="sb sb-snd i3">play sound [Ding ▼]</div>
+            <div class="sb sb-ctrl i3">delete this clone</div>
+            <div class="sb sb-evt i2">if &lt;(x position) &lt; (-240)&gt; then</div>
+            <div class="sb sb-ctrl i3">delete this clone</div>
+          </div>
+          <span>Golden fish do NOT cost a life if missed — they're a bonus opportunity only. The wobbly Y movement makes them harder to catch.</span>
+        </div>
+      </li>
+    </ul>
+
+    <div class="slabel">Part 4 — Fast Fish (hard to catch, 1 point)</div>
+    <ul class="steps">
+      <li>
+        <div class="sc">
+          <strong>FastFish uses a local speed multiplier</strong>
+          <div class="sblocks">
+            <div class="sb sb-hat">🚩 when Green Flag clicked</div>
+            <div class="sb sb-look i1">hide</div>
+            <div class="sb sb-ctrl i1">forever</div>
+            <div class="sb sb-ctrl i2">create clone of [myself ▼]</div>
+            <div class="sb sb-ctrl i2">wait (pick random (3) to (6)) seconds</div>
+          </div>
+          <br/>
+          <div class="sblocks">
+            <div class="sb sb-hat">when I start as a clone</div>
+            <div class="sb sb-look i1">show</div>
+            <div class="sb sb-mot i1">go to x: (240) y: (pick random (-150) to (150))</div>
+            <div class="sb sb-ctrl i1">forever</div>
+            <div class="sb sb-mot i2">change x by ((0) - ((FishSpeed) * (2)))</div>
+            <div class="sb sb-evt i2">if &lt;touching [Shark ▼]?&gt; then</div>
+            <div class="sb sb-var i3">change [Score ▼] by (1)</div>
+            <div class="sb sb-ctrl i3">delete this clone</div>
+            <div class="sb sb-evt i2">if &lt;(x position) &lt; (-240)&gt; then</div>
+            <div class="sb sb-var i3">change [Lives ▼] by (-1)</div>
+            <div class="sb sb-ctrl i3">delete this clone</div>
+          </div>
+          <span>Multiplying FishSpeed by 2 means FastFish always moves at double the current level speed — this scales automatically as difficulty increases.</span>
+        </div>
+      </li>
+    </ul>
+
+    <div class="slabel">Part 5 — Game Over Check</div>
+    <ul class="steps">
+      <li>
+        <div class="sc">
+          <strong>On the Shark sprite, monitor lives in the forever loop</strong>
+          <div class="sblocks">
+            <div class="sb sb-evt i2">if &lt;(Lives) &lt; (1)&gt; then</div>
+            <div class="sb sb-evt i3">broadcast [GameOver ▼]</div>
+            <div class="sb sb-ctrl i3">stop [this script ▼]</div>
+          </div>
+          <span>We'll build the proper Game Over screen in Lesson 4. For now this just stops the shark moving.</span>
+        </div>
+      </li>
+    </ul>
+
+    <div class="tip"><strong>HiScore:</strong> Add this check after updating Score — <code>if Score &gt; HiScore → set HiScore to Score</code>. The HiScore variable never gets reset by startGame, so it persists between games in the same session.</div>
+
+    <div class="chal">
+      <div class="chal-title">🔥 Extension Challenges</div>
+      <ul>
+        <li>Make GoldFish flash between two costumes using a <code>next costume / wait 0.2s</code> loop so it's easy to spot</li>
+        <li>Add a brief score popup: when a fish is caught, make a clone of a "score text" sprite that floats upward and fades out</li>
+        <li>Play a different sound for each fish type (Pop for regular, Ding for gold, Whoosh for fast)</li>
+      </ul>
+    </div>
+
+    <div class="slabel">✅ Lesson 2 Checklist</div>
+    <ul class="checklist">
+      <li>Regular fish spawn randomly from the right at varying heights and sizes</li>
+      <li>Golden fish appear less often, worth 3 points, and wobble as they swim</li>
+      <li>Fast fish move at double speed and are harder to catch</li>
+      <li>Catching any fish increases Score correctly</li>
+      <li>Missing a regular or fast fish costs 1 life</li>
+      <li>HiScore updates whenever Score beats the previous best</li>
+      <li>You can explain: what a clone is, what a Boolean condition is, what collision detection means</li>
+    </ul>
+  </div>
+</article>
+
+<!-- ╔══════════════════════════════════╗ -->
+<!-- ║         LESSON  3               ║ -->
+<!-- ╚══════════════════════════════════╝ -->
+<article class="lesson l3" id="l3">
+  <div class="lesson-hdr" onclick="go(3)">
+    <div class="lnum">03</div>
+    <div class="ltxt">
+      <div class="ltag">Lesson 3 · Custom Blocks (Functions)</div>
+      <div class="ltitle">Tidy Code with Functions 🧩</div>
+      <div class="lsub">Define blocks · Parameters · Abstraction · DRY principle</div>
+    </div>
+    <div class="lemoji">⚙️</div>
+    <div class="lchev">▼</div>
+  </div>
+  <div class="lbody">
+    <div class="obj">
+      <strong>By the end of Lesson 3</strong> you'll have reorganised your entire game into clean, named custom blocks: <code>startGame</code>, <code>catchFish(points)</code>, <code>loseLife</code>, <code>damageShark(amount)</code>, <code>spawnFish</code>, and <code>nextLevel</code>. You'll understand <em>why</em> functions are one of the most important tools in programming.
+    </div>
+
+    <div class="concept">
+      <div class="concept-title">🧠 What is a Function?</div>
+      <p>A <strong>function</strong> (called a <em>Custom Block</em> in Scratch) is a named chunk of code you can reuse. Instead of writing the same logic in ten places, you write it once, give it a name, and call that name whenever you need it.</p>
+      <p style="margin-top:8px;">The two big benefits: <strong>DRY</strong> (Don't Repeat Yourself — less code to write) and <strong>maintainability</strong> (if you want to change how catching a fish works, you change it in one place, not everywhere it happens).</p>
+    </div>
+
+    <div class="slabel">Function 1 — startGame (Shark sprite)</div>
+    <ul class="steps">
+      <li><div class="sc"><strong>Create the custom block</strong><span>Click the <strong>Shark</strong> sprite → <strong>My Blocks</strong> → <em>Make a Block</em> → name it <code>startGame</code> → click OK.</span></div></li>
+      <li>
+        <div class="sc">
+          <strong>Move all your setup code into it</strong>
+          <div class="sblocks">
+            <div class="sb sb-cust">define startGame</div>
+            <div class="sb sb-var i1">set [Score ▼] to (0)</div>
+            <div class="sb sb-var i1">set [Lives ▼] to (3)</div>
+            <div class="sb sb-var i1">set [Health ▼] to (100)</div>
+            <div class="sb sb-var i1">set [Level ▼] to (1)</div>
+            <div class="sb sb-var i1">set [FishSpeed ▼] to (3)</div>
+            <div class="sb sb-var i1">set [TimeBonus ▼] to (30)</div>
+            <div class="sb sb-var i1">set [PoisonActive ▼] to (0)</div>
+            <div class="sb sb-mot i1">go to x: (-150) y: (0)</div>
+            <div class="sb sb-look i1">show</div>
+            <div class="sb sb-look i1">switch backdrop to [Underwater 1 ▼]</div>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="sc">
+          <strong>Call it from the green flag</strong>
+          <div class="sblocks">
+            <div class="sb sb-hat">🚩 when Green Flag clicked</div>
+            <div class="sb sb-cust i1">startGame</div>
+            <div class="sb sb-ctrl i1">forever</div>
+            <div class="sb sb-ctrl i2">— (movement code) —</div>
+          </div>
+        </div>
+      </li>
+    </ul>
+
+    <div class="slabel">Function 2 — catchFish(points) with a Parameter</div>
+    <ul class="steps">
+      <li><div class="sc"><strong>Create catchFish with an input</strong><span>Go to <strong>My Blocks</strong> (on the Fish sprite) → <em>Make a Block</em> → name it <code>catchFish</code>. Click <em>Add an input (number or text)</em> and name it <strong>points</strong>. Click OK.</span></div></li>
+      <li>
+        <div class="sc">
+          <strong>Build the block using the parameter</strong>
+          <div class="sblocks">
+            <div class="sb sb-cust">define catchFish (points)</div>
+            <div class="sb sb-var i1">change [Score ▼] by (points)</div>
+            <div class="sb sb-evt i1">if &lt;(Score) &gt; (HiScore)&gt; then</div>
+            <div class="sb sb-var i2">set [HiScore ▼] to (Score)</div>
+            <div class="sb sb-snd i1">play sound [Pop ▼] until done</div>
+            <div class="sb sb-ctrl i1">delete this clone</div>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="sc">
+          <strong>Call it differently for each fish type</strong>
+          <div class="sblocks">
+            <div class="sb sb-cust">catchFish (1)</div>
+            <div style="color:var(--dimmer);font-size:0.8rem;padding:4px 0;">← for regular fish</div>
+            <div class="sb sb-cust">catchFish (3)</div>
+            <div style="color:var(--dimmer);font-size:0.8rem;padding:4px 0;">← for golden fish</div>
+            <div class="sb sb-cust">catchFish (1)</div>
+            <div style="color:var(--dimmer);font-size:0.8rem;padding:4px 0;">← for fast fish</div>
+          </div>
+          <span>Same function, different <em>arguments</em>. The word inside the brackets is called an <strong>argument</strong> — the value you pass into the parameter.</span>
+        </div>
+      </li>
+    </ul>
+
+    <div class="slabel">Function 3 — loseLife (Fish sprite)</div>
+    <ul class="steps">
+      <li>
+        <div class="sc">
+          <strong>Create loseLife on the Fish sprite</strong>
+          <div class="sblocks">
+            <div class="sb sb-cust">define loseLife</div>
+            <div class="sb sb-var i1">change [Lives ▼] by (-1)</div>
+            <div class="sb sb-snd i1">play sound [Oops ▼]</div>
+            <div class="sb sb-ctrl i1">if &lt;(Lives) &lt; (1)&gt; then</div>
+            <div class="sb sb-evt i2">broadcast [GameOver ▼]</div>
+          </div>
+        </div>
+      </li>
+    </ul>
+
+    <div class="slabel">Function 4 — damageShark(amount) (Shark sprite)</div>
+    <ul class="steps">
+      <li>
+        <div class="sc">
+          <strong>This will be used by enemies in Lesson 4</strong>
+          <div class="sblocks">
+            <div class="sb sb-cust">define damageShark (amount)</div>
+            <div class="sb sb-ctrl i1">if &lt;(PoisonActive) = (0)&gt; then</div>
+            <div class="sb sb-var i2">change [Health ▼] by ((0) - (amount))</div>
+            <div class="sb sb-look i2">set [color ▼] effect to (50)</div>
+            <div class="sb sb-ctrl i2">wait (0.2) seconds</div>
+            <div class="sb sb-look i2">clear graphic effects</div>
+            <div class="sb sb-ctrl i1">if &lt;(Health) &lt; (1)&gt; then</div>
+            <div class="sb sb-var i2">change [Lives ▼] by (-1)</div>
+            <div class="sb sb-var i2">set [Health ▼] to (100)</div>
+            <div class="sb sb-ctrl i2">if &lt;(Lives) &lt; (1)&gt; then</div>
+            <div class="sb sb-evt i3">broadcast [GameOver ▼]</div>
+          </div>
+          <span>When health hits zero, the shark loses a life but health resets to 100 — giving the player a chance to survive.</span>
+        </div>
+      </li>
+    </ul>
+
+    <div class="slabel">Function 5 — nextLevel (Shark sprite)</div>
+    <ul class="steps">
+      <li>
+        <div class="sc">
+          <strong>Increase difficulty and update the scene</strong>
+          <div class="sblocks">
+            <div class="sb sb-cust">define nextLevel</div>
+            <div class="sb sb-var i1">change [Level ▼] by (1)</div>
+            <div class="sb sb-var i1">change [FishSpeed ▼] by (1)</div>
+            <div class="sb sb-var i1">change [Score ▼] by (TimeBonus)</div>
+            <div class="sb sb-var i1">set [Health ▼] to (100)</div>
+            <div class="sb sb-var i1">set [TimeBonus ▼] to (30)</div>
+            <div class="sb sb-look i1">next backdrop</div>
+            <div class="sb sb-look i1">say (join [Level ] (Level)) for (2) secs</div>
+            <div class="sb sb-evt i1">broadcast [LevelUp ▼]</div>
+          </div>
+        </div>
+      </li>
+    </ul>
+
+    <div class="tip">Notice how <code>nextLevel</code> also adds the <strong>TimeBonus</strong> to Score and resets Health — the player is rewarded for completing a level quickly and starts fresh. This is a <em>game design decision</em>, not just a coding choice.</div>
+
+    <div class="slabel">Calling nextLevel — Every 5 Fish Caught</div>
+    <ul class="steps">
+      <li>
+        <div class="sc">
+          <strong>Add this check to the shark's forever loop</strong>
+          <div class="sblocks">
+            <div class="sb sb-ctrl i2">if &lt;((Score) mod (5)) = (0) and (Score) &gt; (0)&gt; then</div>
+            <div class="sb sb-cust i3">nextLevel</div>
+          </div>
+          <span><strong>mod</strong> (modulo) gives the remainder of division. <code>15 mod 5 = 0</code>, <code>16 mod 5 = 1</code>. So this fires at exactly 5, 10, 15, 20 fish caught.</span>
+        </div>
+      </li>
+    </ul>
+
+    <div class="chal">
+      <div class="chal-title">🔥 Extension Challenge — Function with boolean parameter</div>
+      <p>Edit <code>loseLife</code> to accept a boolean parameter <strong>showWarning</strong>. If it's 1, show a red flash on screen. If it's 0, just deduct quietly. This teaches conditional logic inside functions.</p>
+    </div>
+
+    <div class="slabel">✅ Lesson 3 Checklist</div>
+    <ul class="checklist">
+      <li><code>startGame</code> resets all 8 variables and is called from the green flag</li>
+      <li><code>catchFish(points)</code> uses a parameter and updates HiScore</li>
+      <li><code>loseLife</code> deducts a life and broadcasts GameOver when Lives = 0</li>
+      <li><code>damageShark(amount)</code> reduces Health and handles health = 0</li>
+      <li><code>nextLevel</code> increases Level and FishSpeed, adds TimeBonus to Score, changes backdrop</li>
+      <li>The game still plays exactly as before — functions didn't change behaviour, just organisation</li>
+      <li>You can explain: what a parameter is, what DRY means, why functions help with debugging</li>
+    </ul>
+  </div>
+</article>
+
+<!-- ╔══════════════════════════════════╗ -->
+<!-- ║         LESSON  4               ║ -->
+<!-- ╚══════════════════════════════════╝ -->
+<article class="lesson l4" id="l4">
+  <div class="lesson-hdr" onclick="go(4)">
+    <div class="lnum">04</div>
+    <div class="ltxt">
+      <div class="ltag">Lesson 4 · Enemies, Health & Hazards</div>
+      <div class="ltitle">Danger in the Deep ☠️</div>
+      <div class="lsub">Jellyfish · Mines · Pufferfish · Octopus · Health system · Poison effect</div>
+    </div>
+    <div class="lemoji">🪼</div>
+    <div class="lchev">▼</div>
+  </div>
+  <div class="lbody">
+    <div class="obj">
+      <strong>By the end of Lesson 4</strong> your shark will face five types of hazard: a jellyfish that drains health, a mine that causes instant life loss, a pufferfish that poisons the shark slowing it down, an octopus that blocks movement, and a whirlpool that briefly pulls the shark off course.
+    </div>
+
+    <div class="enemy-box">
+      <div class="enemy-title">☠️ Enemies & Hazards Guide</div>
+      <div class="enemy-grid">
+        <div class="enemy-item">
+          <div class="ei-name">🪼 Jellyfish</div>
+          <div class="ei-desc">Floats up and down slowly. Appears from Level 1.</div>
+          <div class="ei-effect">Effect: -10 Health per second of contact</div>
+        </div>
+        <div class="enemy-item">
+          <div class="ei-name">💣 Mine</div>
+          <div class="ei-desc">Drifts slowly across the screen. Appears from Level 2.</div>
+          <div class="ei-effect">Effect: -1 Life instantly on touch</div>
+        </div>
+        <div class="enemy-item">
+          <div class="ei-name">🐡 Pufferfish</div>
+          <div class="ei-desc">Swims like a fish but inflates when touched. Level 3+.</div>
+          <div class="ei-effect">Effect: Activates PoisonActive for 5 seconds — shark moves at half speed</div>
+        </div>
+        <div class="enemy-item">
+          <div class="ei-name">🐙 Octopus</div>
+          <div class="ei-desc">Emerges from the bottom. Tentacles grab the shark. Level 4+.</div>
+          <div class="ei-effect">Effect: Freezes shark movement for 2 seconds, -15 Health</div>
+        </div>
+        <div class="enemy-item">
+          <div class="ei-name">🌀 Whirlpool</div>
+          <div class="ei-desc">Appears randomly on screen, slowly rotates. Level 5+.</div>
+          <div class="ei-effect">Effect: Pushes shark in a random direction, -5 Health</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slabel">Hazard 1 — Jellyfish</div>
+    <ul class="steps">
+      <li><div class="sc"><strong>Add a Jellyfish sprite</strong><span>Search the sprite library for "Jellyfish" or draw one. Rename it "Jellyfish". Make it semi-transparent in the costumes editor (set fill opacity to 70%).</span></div></li>
+      <li>
+        <div class="sc">
+          <strong>Factory script (green flag)</strong>
+          <div class="sblocks">
+            <div class="sb sb-hat">🚩 when Green Flag clicked</div>
+            <div class="sb sb-look i1">hide</div>
+            <div class="sb sb-ctrl i1">forever</div>
+            <div class="sb sb-ctrl i2">create clone of [myself ▼]</div>
+            <div class="sb sb-ctrl i2">wait (pick random (4) to (8)) seconds</div>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="sc">
+          <strong>Clone script — floating movement</strong>
+          <div class="sblocks">
+            <div class="sb sb-hat">when I start as a clone</div>
+            <div class="sb sb-look i1">show</div>
+            <div class="sb sb-mot i1">go to x: (pick random (-200) to (200)) y: (-200)</div>
+            <div class="sb sb-ctrl i1">forever</div>
+            <div class="sb sb-mot i2">change y by (2)</div>
+            <div class="sb sb-mot i2">change x by (pick random (-1) to (1))</div>
+            <div class="sb sb-evt i2">if &lt;touching [Shark ▼]?&gt; then</div>
+            <div class="sb sb-cust i3">damageShark (10)</div>
+            <div class="sb sb-ctrl i3">wait (0.5) seconds</div>
+            <div class="sb sb-evt i2">if &lt;(y position) &gt; (200)&gt; then</div>
+            <div class="sb sb-ctrl i3">delete this clone</div>
+          </div>
+          <span>The <code>wait 0.5 seconds</code> after dealing damage prevents the shark from losing all health instantly — it caps the damage rate to 20 HP per second.</span>
+        </div>
+      </li>
+    </ul>
+
+    <div class="slabel">Hazard 2 — Mine</div>
+    <ul class="steps">
+      <li><div class="sc"><strong>Add a Mine sprite</strong><span>Draw a simple black circle with small spikes (like a sea mine) in the Paint editor, or search the library. Rename it "Mine".</span></div></li>
+      <li>
+        <div class="sc">
+          <strong>Mine clone script</strong>
+          <div class="sblocks">
+            <div class="sb sb-hat">🚩 when Green Flag clicked</div>
+            <div class="sb sb-look i1">hide</div>
+            <div class="sb sb-ctrl i1">forever</div>
+            <div class="sb sb-ctrl i2">if &lt;(Level) &gt; (1)&gt; then</div>
+            <div class="sb sb-ctrl i3">create clone of [myself ▼]</div>
+            <div class="sb sb-ctrl i2">wait (pick random (6) to (12)) seconds</div>
+          </div>
+          <br/>
+          <div class="sblocks">
+            <div class="sb sb-hat">when I start as a clone</div>
+            <div class="sb sb-look i1">show</div>
+            <div class="sb sb-mot i1">go to x: (240) y: (pick random (-150) to (150))</div>
+            <div class="sb sb-ctrl i1">forever</div>
+            <div class="sb sb-mot i2">change x by (-1)</div>
+            <div class="sb sb-evt i2">if &lt;touching [Shark ▼]?&gt; then</div>
+            <div class="sb sb-var i3">change [Lives ▼] by (-1)</div>
+            <div class="sb sb-look i3">set [ghost ▼] effect to (80)</div>
+            <div class="sb sb-ctrl i3">wait (0.3) seconds</div>
+            <div class="sb sb-ctrl i3">delete this clone</div>
+            <div class="sb sb-evt i2">if &lt;(x position) &lt; (-250)&gt; then</div>
+            <div class="sb sb-ctrl i3">delete this clone</div>
+          </div>
+          <span>Mines only start appearing from Level 2 (the <code>if Level &gt; 1</code> check). They're slow but deadly — instant life loss.</span>
+        </div>
+      </li>
+    </ul>
+
+    <div class="slabel">Hazard 3 — Pufferfish (Poison)</div>
+    <ul class="steps">
+      <li><div class="sc"><strong>Add a Pufferfish sprite</strong><span>Search the library or paint a round fish. Give it two costumes: normal (small) and puffed up (large circle). Rename it "Pufferfish".</span></div></li>
+      <li>
+        <div class="sc">
+          <strong>Poison effect script</strong>
+          <div class="sblocks">
+            <div class="sb sb-hat">when I start as a clone</div>
+            <div class="sb sb-look i1">show</div>
+            <div class="sb sb-look i1">switch costume to [puffer-normal ▼]</div>
+            <div class="sb sb-mot i1">go to x: (240) y: (pick random (-150) to (150))</div>
+            <div class="sb sb-ctrl i1">forever</div>
+            <div class="sb sb-mot i2">change x by ((0) - (FishSpeed))</div>
+            <div class="sb sb-evt i2">if &lt;touching [Shark ▼]?&gt; then</div>
+            <div class="sb sb-look i3">switch costume to [puffer-big ▼]</div>
+            <div class="sb sb-var i3">set [PoisonActive ▼] to (1)</div>
+            <div class="sb sb-ctrl i3">wait (5) seconds</div>
+            <div class="sb sb-var i3">set [PoisonActive ▼] to (0)</div>
+            <div class="sb sb-ctrl i3">delete this clone</div>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="sc">
+          <strong>Slow the shark when poisoned — modify movement code</strong>
+          <span>In the shark's movement forever loop, change the movement amounts:</span>
+          <div class="sblocks">
+            <div class="sb sb-evt i2">if &lt;key [right arrow ▼] pressed?&gt; then</div>
+            <div class="sb sb-ctrl i3">if &lt;(PoisonActive) = (1)&gt; then</div>
+            <div class="sb sb-mot" style="margin-left:72px">change x by (3)</div>
+            <div class="sb sb-ctrl i3">else</div>
+            <div class="sb sb-mot" style="margin-left:72px">change x by (6)</div>
+          </div>
+          <span>Repeat this pattern for all 4 directions. When poisoned, the shark moves at half speed. The same pattern goes for Y movement.</span>
+        </div>
+      </li>
+    </ul>
+
+    <div class="slabel">Hazard 4 — Octopus (Freeze)</div>
+    <ul class="steps">
+      <li><div class="sc"><strong>Add Octopus sprite from the library</strong><span>Rename it "Octopus". It will rise from the bottom and broadcast a freeze event when touched.</span></div></li>
+      <li>
+        <div class="sc">
+          <strong>Octopus clone + freeze broadcast</strong>
+          <div class="sblocks">
+            <div class="sb sb-hat">when I start as a clone</div>
+            <div class="sb sb-look i1">show</div>
+            <div class="sb sb-mot i1">go to x: (pick random (-180) to (180)) y: (-200)</div>
+            <div class="sb sb-ctrl i1">repeat (60)</div>
+            <div class="sb sb-mot i2">change y by (3)</div>
+            <div class="sb sb-evt i2">if &lt;touching [Shark ▼]?&gt; then</div>
+            <div class="sb sb-evt i3">broadcast [FreezeShark ▼]</div>
+            <div class="sb sb-cust i3">damageShark (15)</div>
+            <div class="sb sb-ctrl i3">delete this clone</div>
+            <div class="sb sb-ctrl i1">delete this clone</div>
+          </div>
+          <br/>
+          <div class="sblocks">
+            <div class="sb sb-hat" style="background:#3da8c9;color:#fff;">when I receive [FreezeShark ▼]</div>
+            <span style="font-size:0.78rem;color:var(--dimmer);padding:2px 0;display:block;">← Add this to the SHARK sprite</span>
+            <div class="sb sb-ctrl i1">stop [other scripts in sprite ▼]</div>
+            <div class="sb sb-look i1">set [color ▼] effect to (150)</div>
+            <div class="sb sb-ctrl i1">wait (2) seconds</div>
+            <div class="sb sb-look i1">clear graphic effects</div>
+            <div class="sb sb-evt i1">broadcast [UnfreezeShark ▼]</div>
+          </div>
+        </div>
+      </li>
+    </ul>
+
+    <div class="tip">Using <strong>broadcast</strong> to communicate between sprites is a key Scratch technique. It's a simplified version of the <em>event-driven programming</em> pattern used in real apps and games.</div>
+
+    <div class="slabel">Hazard 5 — Whirlpool</div>
+    <ul class="steps">
+      <li><div class="sc"><strong>Create a Whirlpool sprite in the Paint editor</strong><span>Draw a blue spiral. Give it two costumes and animate it. Rename it "Whirlpool".</span></div></li>
+      <li>
+        <div class="sc">
+          <strong>Whirlpool script — push effect</strong>
+          <div class="sblocks">
+            <div class="sb sb-hat">when I start as a clone</div>
+            <div class="sb sb-look i1">show</div>
+            <div class="sb sb-mot i1">go to x: (pick random (-180) to (180)) y: (pick random (-150) to (150))</div>
+            <div class="sb sb-ctrl i1">repeat (200)</div>
+            <div class="sb sb-look i2">next costume</div>
+            <div class="sb sb-ctrl i2">wait (0.1) seconds</div>
+            <div class="sb sb-evt i2">if &lt;touching [Shark ▼]?&gt; then</div>
+            <div class="sb sb-mot i3">change x by (pick random (-20) to (20))</div>
+            <div class="sb sb-mot i3">change y by (pick random (-20) to (20))</div>
+            <div class="sb sb-cust i3">damageShark (5)</div>
+            <div class="sb sb-ctrl i1">delete this clone</div>
+          </div>
+        </div>
+      </li>
+    </ul>
+
+    <div class="chal">
+      <div class="chal-title">🔥 Extension Challenges</div>
+      <ul>
+        <li>Add a visual <strong>health bar</strong> sprite: a long rectangle that changes width based on the Health variable using <code>set size to (Health) %</code> (width only)</li>
+        <li>Make the shark turn green and flash when PoisonActive = 1 using a colour effect loop</li>
+        <li>Add a <strong>power-up fish</strong> (a starfish?) — catching it sets Health back to 100 and gives 5 seconds of invincibility where damageShark does nothing</li>
+      </ul>
+    </div>
+
+    <div class="slabel">✅ Lesson 4 Checklist</div>
+    <ul class="checklist">
+      <li>Jellyfish drains Health by 10 on contact (with 0.5s cooldown)</li>
+      <li>Mines appear from Level 2 and instantly cost a life on contact</li>
+      <li>Pufferfish sets PoisonActive = 1 for 5 seconds, halving shark speed</li>
+      <li>Octopus broadcasts FreezeShark, stopping movement for 2 seconds</li>
+      <li>Whirlpool pushes the shark in a random direction</li>
+      <li><code>damageShark(amount)</code> function is used by all enemies</li>
+      <li>Health dropping to 0 costs a life and resets Health to 100</li>
+      <li>You can explain: event-driven programming, what a broadcast does, why the damage cooldown is important</li>
+    </ul>
+  </div>
+</article>
+
+<!-- ╔══════════════════════════════════╗ -->
+<!-- ║         LESSON  5               ║ -->
+<!-- ╚══════════════════════════════════╝ -->
+<article class="lesson l5" id="l5">
+  <div class="lesson-hdr" onclick="go(5)">
+    <div class="lnum">05</div>
+    <div class="ltxt">
+      <div class="ltag">Lesson 5 · Levels & Changing Worlds</div>
+      <div class="ltitle">Level Up! 🌊</div>
+      <div class="lsub">6 backdrops · Level transitions · Difficulty scaling · Game Over screen</div>
+    </div>
+    <div class="lemoji">⚡</div>
+    <div class="lchev">▼</div>
+  </div>
+  <div class="lbody">
+    <div class="obj">
+      <strong>By the end of Lesson 5</strong> your game will have 6 full levels, each with a different ocean backdrop, increasing difficulty, new enemies unlocking at specific levels, a TimeBonus countdown, and a polished Game Over screen that shows the final score and HiScore.
+    </div>
+
+    <div class="slabel">Part 1 — The 6 Level Backdrops</div>
+    <p style="color:var(--dim);font-size:0.87rem;line-height:1.7;margin-bottom:14px;">Go to the <strong>Stage</strong> → <strong>Backdrops</strong> tab. Add 6 backdrops in order. The <code>next backdrop</code> block in your <code>nextLevel</code> function will cycle through them automatically.</p>
+    <div class="backdrop-grid">
+      <div class="backdrop-card bc1">
+        <div class="bd-icon">🌅</div>
+        <div class="bd-level">Level 1</div>
+        <div class="bd-name">Shallow Reef</div>
+        <div class="bd-desc">Bright, colourful coral. "Underwater 1" from library.</div>
+      </div>
+      <div class="backdrop-card bc2">
+        <div class="bd-icon">🌿</div>
+        <div class="bd-level">Level 2</div>
+        <div class="bd-name">Seagrass Meadow</div>
+        <div class="bd-desc">Murky green. "Underwater 2" from library.</div>
+      </div>
+      <div class="backdrop-card bc3">
+        <div class="bd-icon">🔆</div>
+        <div class="bd-level">Level 3</div>
+        <div class="bd-name">Open Ocean</div>
+        <div class="bd-desc">Deep blue, less coral. Use "Blue Sky 2" recoloured.</div>
+      </div>
+      <div class="backdrop-card bc4">
+        <div class="bd-icon">🌑</div>
+        <div class="bd-level">Level 4</div>
+        <div class="bd-name">Twilight Zone</div>
+        <div class="bd-desc">Dark purple. Use Paint — dark gradient background.</div>
+      </div>
+      <div class="backdrop-card bc5">
+        <div class="bd-icon">🔴</div>
+        <div class="bd-level">Level 5</div>
+        <div class="bd-name">Volcanic Vent</div>
+        <div class="bd-desc">Dark red/orange glow. Paint a dark bg with orange spots.</div>
+      </div>
+      <div class="backdrop-card bc6">
+        <div class="bd-icon">🌌</div>
+        <div class="bd-level">Level 6</div>
+        <div class="bd-name">The Abyss</div>
+        <div class="bd-desc">Near-black. Paint nearly black — adds dramatic tension.</div>
+      </div>
+    </div>
+    <div class="tip">After adding all 6 backdrops, check they appear in the right order in the Backdrops tab. <code>next backdrop</code> moves through them in order, looping back to the first if it reaches the end.</div>
+
+    <div class="slabel">Part 2 — Level Difficulty Table</div>
+    <p style="color:var(--dim);font-size:0.87rem;line-height:1.7;margin-bottom:12px;">Your <code>nextLevel</code> function increases FishSpeed by 1 each time. Here's how each level feels:</p>
+    <table class="level-table">
+      <tr><th>Level</th><th>FishSpeed</th><th>Spawn Delay</th><th>New Enemies Unlocked</th><th>TimeBonus</th></tr>
+      <tr><td class="lvl">1</td><td>3</td><td>1–3 sec</td><td>Jellyfish only</td><td>30</td></tr>
+      <tr><td class="lvl">2</td><td>4</td><td>0.8–2.5 sec</td><td>Mines appear</td><td>30</td></tr>
+      <tr><td class="lvl">3</td><td>5</td><td>0.6–2 sec</td><td>Pufferfish appear</td><td>30</td></tr>
+      <tr><td class="lvl">4</td><td>6</td><td>0.5–1.5 sec</td><td>Octopus appears</td><td>30</td></tr>
+      <tr><td class="lvl">5</td><td>7</td><td>0.4–1.2 sec</td><td>Whirlpools appear</td><td>30</td></tr>
+      <tr><td class="lvl">6</td><td>8</td><td>0.3–1 sec</td><td>All enemies — survival mode</td><td>30</td></tr>
+    </table>
+
+    <div class="slabel">Part 3 — Level-Gated Enemy Spawning</div>
+    <ul class="steps">
+      <li>
+        <div class="sc">
+          <strong>Each enemy checks the Level variable before spawning</strong>
+          <span>You already did this for Mines. Do the same for each other enemy. Example — Pufferfish:</span>
+          <div class="sblocks">
+            <div class="sb sb-hat">🚩 when Green Flag clicked</div>
+            <div class="sb sb-look i1">hide</div>
+            <div class="sb sb-ctrl i1">forever</div>
+            <div class="sb sb-ctrl i2">if &lt;(Level) ≥ (3)&gt; then</div>
+            <div class="sb sb-ctrl i3">create clone of [myself ▼]</div>
+            <div class="sb sb-ctrl i2">wait (pick random (5) to (10)) seconds</div>
+          </div>
+          <span>Apply this pattern to each enemy with their unlock level from the table above.</span>
+        </div>
+      </li>
+    </ul>
+
+    <div class="slabel">Part 4 — TimeBonus Countdown</div>
+    <ul class="steps">
+      <li>
+        <div class="sc">
+          <strong>Add a separate countdown script on the Shark</strong>
+          <div class="sblocks">
+            <div class="sb sb-hat" style="background:#3da8c9;color:#fff;">when I receive [LevelUp ▼]</div>
+            <div class="sb sb-ctrl i1">repeat (30)</div>
+            <div class="sb sb-ctrl i2">wait (1) seconds</div>
+            <div class="sb sb-ctrl i2">if &lt;(TimeBonus) &gt; (0)&gt; then</div>
+            <div class="sb sb-var i3">change [TimeBonus ▼] by (-1)</div>
+          </div>
+          <span>When a level starts (triggered by the LevelUp broadcast), TimeBonus counts down from 30 to 0. Whatever's left gets added to Score when <code>nextLevel</code> fires.</span>
+        </div>
+      </li>
+    </ul>
+
+    <div class="slabel">Part 5 — Winning at Level 6</div>
+    <ul class="steps">
+      <li>
+        <div class="sc">
+          <strong>Check if Level goes past 6 → trigger Win state</strong>
+          <span>Add to the nextLevel check in the forever loop:</span>
+          <div class="sblocks">
+            <div class="sb sb-ctrl i2">if &lt;(Level) &gt; (6)&gt; then</div>
+            <div class="sb sb-evt i3">broadcast [YouWin ▼]</div>
+            <div class="sb sb-ctrl i3">stop [this script ▼]</div>
+          </div>
+        </div>
+      </li>
+    </ul>
+
+    <div class="slabel">Part 6 — Game Over & You Win Screens</div>
+    <ul class="steps">
+      <li><div class="sc"><strong>Create a "GameOver" sprite</strong><span>Use the Paint editor. Draw a dark rectangle that covers most of the stage. Add text: "GAME OVER", and use <code>join</code> blocks to show the score and HiScore. Add a "Press Space to Restart" instruction.</span></div></li>
+      <li>
+        <div class="sc">
+          <strong>GameOver sprite code</strong>
+          <div class="sblocks">
+            <div class="sb sb-hat">🚩 when Green Flag clicked</div>
+            <div class="sb sb-look i1">hide</div>
+            <br/>
+            <div class="sb sb-hat" style="background:#3da8c9;color:#fff;">when I receive [GameOver ▼]</div>
+            <div class="sb sb-look i1">show</div>
+            <div class="sb sb-look i1">go to front layer</div>
+            <div class="sb sb-look i1">say (join [Score: ] (join (Score) (join [  Best: ] (HiScore))))</div>
+            <div class="sb sb-ctrl i1">wait until &lt;key [space ▼] pressed?&gt;</div>
+            <div class="sb sb-look i1">hide</div>
+            <div class="sb sb-evt i1">broadcast [RestartGame ▼]</div>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="sc">
+          <strong>Restart the game from broadcast</strong>
+          <span>On the Shark sprite, add:</span>
+          <div class="sblocks">
+            <div class="sb sb-hat" style="background:#3da8c9;color:#fff;">when I receive [RestartGame ▼]</div>
+            <div class="sb sb-cust i1">startGame</div>
+            <div class="sb sb-ctrl i1">forever</div>
+            <div class="sb sb-ctrl i2">— (movement code) —</div>
+          </div>
+          <span>Now the game fully restarts without needing to press the green flag again.</span>
+        </div>
+      </li>
+      <li><div class="sc"><strong>Create a YouWin screen similarly</strong><span>Duplicate the GameOver sprite, change the text to "YOU WIN! 🏆", add a congratulations message with the final score, and trigger it from the YouWin broadcast.</span></div></li>
+    </ul>
+
+    <div class="chal">
+      <div class="chal-title">🔥 Extension Challenges</div>
+      <ul>
+        <li>Add a <strong>level transition animation</strong> — when LevelUp broadcasts, show a full-screen flash or a "LEVEL 2" text sprite that fades in and out before gameplay resumes</li>
+        <li>Play <strong>different background music</strong> per level using a music sprite that changes its costume/sound on each LevelUp broadcast</li>
+        <li>Add a <strong>combo multiplier</strong> — catch 3 fish in a row within 3 seconds, get 2x points. Miss one = combo resets</li>
+      </ul>
+    </div>
+
+    <div class="slabel">✅ Lesson 5 Checklist</div>
+    <ul class="checklist">
+      <li>All 6 backdrops are added to the Stage in order</li>
+      <li>Backdrop changes automatically with each level via <code>next backdrop</code></li>
+      <li>Each enemy has a level gate — enemies unlock progressively</li>
+      <li>TimeBonus counts down during each level and is added to Score on level completion</li>
+      <li>Level 7 triggers a YouWin broadcast instead of a new level</li>
+      <li>Game Over screen shows Score and HiScore</li>
+      <li>Pressing Space on the Game Over screen fully restarts the game</li>
+      <li>You can explain: what event-driven programming is, how broadcasts enable sprite communication</li>
+    </ul>
+  </div>
+</article>
+
+<!-- ╔══════════════════════════════════╗ -->
+<!-- ║         LESSON  6               ║ -->
+<!-- ╚══════════════════════════════════╝ -->
+<article class="lesson l6" id="l6">
+  <div class="lesson-hdr" onclick="go(6)">
+    <div class="lnum">06</div>
+    <div class="ltxt">
+      <div class="ltag">Lesson 6 · Polish, Debug & Showcase</div>
+      <div class="ltitle">Make It Shine ✨</div>
+      <div class="lsub">Sound · Health bar · Start screen · Debugging · Peer review · Share</div>
+    </div>
+    <div class="lemoji">🏆</div>
+    <div class="lchev">▼</div>
+  </div>
+  <div class="lbody">
+    <div class="obj">
+      <strong>By the end of Lesson 6</strong> your game will feel like a complete, polished product — with a start screen, background music that changes per level, a visual health bar, particle effects, and your project shared on the Scratch community.
+    </div>
+
+    <div class="slabel">Part 1 — Start Screen</div>
+    <ul class="steps">
+      <li><div class="sc"><strong>Create a StartScreen sprite</strong><span>Paint a large rectangle that covers the stage. Add your game title "SHARK ATTACK!", the controls (arrow keys to move, avoid enemies, catch fish), and "Press SPACE to Start".</span></div></li>
+      <li>
+        <div class="sc">
+          <strong>StartScreen code</strong>
+          <div class="sblocks">
+            <div class="sb sb-hat">🚩 when Green Flag clicked</div>
+            <div class="sb sb-look i1">show</div>
+            <div class="sb sb-look i1">go to front layer</div>
+            <div class="sb sb-look i1">switch backdrop to [title-screen ▼]</div>
+            <div class="sb sb-ctrl i1">wait until &lt;key [space ▼] pressed?&gt;</div>
+            <div class="sb sb-look i1">hide</div>
+            <div class="sb sb-evt i1">broadcast [StartGame ▼]</div>
+          </div>
+        </div>
+      </li>
+      <li><div class="sc"><strong>Update all sprites to wait for StartGame</strong><span>Change every sprite's green flag script so their factories don't start until they receive the StartGame broadcast. This stops fish and enemies spawning before the player is ready.</span></div></li>
+    </ul>
+
+    <div class="slabel">Part 2 — Visual Health Bar</div>
+    <ul class="steps">
+      <li><div class="sc"><strong>Create a HealthBar sprite</strong><span>In the Paint editor, draw a green rectangle about 100px wide and 12px tall. Position it in the top-right corner of the stage.</span></div></li>
+      <li>
+        <div class="sc">
+          <strong>Make it scale with Health</strong>
+          <div class="sblocks">
+            <div class="sb sb-hat">🚩 when Green Flag clicked</div>
+            <div class="sb sb-ctrl i1">forever</div>
+            <div class="sb sb-look i2">set size to (Health) %</div>
+            <div class="sb sb-ctrl i2">if &lt;(Health) &gt; (60)&gt; then</div>
+            <div class="sb sb-look i3">set [color ▼] effect to (0)</div>
+            <div class="sb sb-ctrl i2">else if &lt;(Health) &gt; (30)&gt; then</div>
+            <div class="sb sb-look i3">set [color ▼] effect to (25)</div>
+            <div class="sb sb-ctrl i2">else</div>
+            <div class="sb sb-look i3">set [color ▼] effect to (0) ... and make it flash red</div>
+          </div>
+          <span>Green = healthy (60–100), yellow = caution (30–60), red and flashing = danger (0–30). This gives the player at-a-glance health feedback.</span>
+        </div>
+      </li>
+    </ul>
+
+    <div class="slabel">Part 3 — Sound Design</div>
+    <ul class="steps">
+      <li><div class="sc"><strong>Background music</strong><span>Add a Music sprite. On StartGame broadcast: play a looping background track. On LevelUp: switch to a slightly faster/more intense track. On GameOver: play a sad jingle.</span></div></li>
+      <li><div class="sc"><strong>Sound effects checklist</strong>
+        <ul style="margin-left:18px;margin-top:8px;color:var(--dim);font-size:0.85rem;line-height:1.9;">
+          <li>🎵 Regular fish caught: <strong>Pop</strong></li>
+          <li>🎵 Gold fish caught: <strong>Ding / Tada</strong></li>
+          <li>🎵 Life lost: <strong>Oops / Boing</strong></li>
+          <li>🎵 Jellyfish hit: <strong>Zap / Crackle</strong></li>
+          <li>🎵 Mine explodes: <strong>Boom / Crash</strong></li>
+          <li>🎵 Poisoned: <strong>Wah Wah / Sad Trombone</strong></li>
+          <li>🎵 Level up: <strong>Trumpet / Fanfare</strong></li>
+          <li>🎵 Game over: <strong>Lose / Game Over</strong></li>
+          <li>🎵 You win: <strong>Win / Cheer</strong></li>
+        </ul>
+      </div></li>
+    </ul>
+
+    <div class="slabel">Part 4 — Particle Effects</div>
+    <ul class="steps">
+      <li><div class="sc"><strong>Create a "Particle" sprite — small sparkle/bubble</strong><span>Draw a tiny star or circle in the Paint editor. This will be used for a catch effect.</span></div></li>
+      <li>
+        <div class="sc">
+          <strong>Spawn particles when a fish is caught</strong>
+          <span>In your <code>catchFish</code> function, add before deleting the clone:</span>
+          <div class="sblocks">
+            <div class="sb sb-ctrl i1">repeat (5)</div>
+            <div class="sb sb-ctrl i2">create clone of [Particle ▼]</div>
+          </div>
+          <span>Then on the Particle sprite, when starting as a clone: go to the fish's position, move in a random direction, fade out (ghost effect 0→100), then delete.</span>
+        </div>
+      </li>
+    </ul>
+
+    <div class="slabel">Part 5 — Debugging Your Game</div>
+    <ul class="steps">
+      <li><div class="sc"><strong>Playtest 3 full games</strong><span>Write down: anything that crashes, any score that seems wrong, any enemy that behaves unexpectedly, anything that feels unfair or boring.</span></div></li>
+      <li><div class="sc"><strong>Use variable monitors to debug</strong><span>Tick the checkbox on PoisonActive and Lives temporarily. Watch them change in real-time during play. Untick when fixed.</span></div></li>
+      <li><div class="sc"><strong>Give your game to someone else to play — don't explain anything</strong><span>Watch where they get confused. If they can't figure out the controls, you need a better start screen. If they die without knowing why, your feedback needs improving.</span></div></li>
+    </ul>
+    <div class="warn">Common bugs: score increasing multiple times per catch (fix: delete clone immediately after catchFish), enemies dealing damage too fast (fix: add a wait after damageShark), Level variable going past 6 (fix: cap with <code>if Level &gt; 6 → set Level to 6</code> OR trigger YouWin).</div>
+
+    <div class="slabel">Part 6 — Share & Showcase</div>
+    <ul class="steps">
+      <li><div class="sc"><strong>Write a project description</strong><span>In Scratch, click <em>Share</em> then fill in: Title ("SHARK ATTACK! by [Your Name]"), Instructions (arrow keys, what to avoid, how to score), and Notes (how long it took, what you're most proud of).</span></div></li>
+      <li><div class="sc"><strong>Peer review</strong><span>Play two classmates' games. Leave a comment with: one specific thing you liked (be precise — not "it's good", but "the golden fish wobbling is a great challenge") and one constructive suggestion.</span></div></li>
+    </ul>
+
+    <div class="slabel">🌟 Bonus Mega-Challenges</div>
+    <div class="chal">
+      <div class="chal-title">If you finished everything — try these!</div>
+      <ul>
+        <li><strong>Power-up Starfish</strong> — catching it gives 10 seconds of invincibility (PoisonActive blocks damage already, use a similar InvincibleActive variable)</li>
+        <li><strong>Scrolling seabed</strong> — create a long backdrop sprite and scroll it left at FishSpeed to give the illusion of movement</li>
+        <li><strong>High score leaderboard</strong> — use Scratch's cloud variables (requires account) to store top 3 scores that persist between sessions for all players</li>
+        <li><strong>Two-player mode</strong> — second shark controlled by WASD keys, competing for the same fish, each with their own score variable</li>
+        <li><strong>Boss level at Level 6</strong> — a giant whale that slowly moves across the screen. Takes 5 hits to kill (using a BossHealth variable). Defeating it gives 20 bonus points.</li>
+      </ul>
+    </div>
+
+    <div class="slabel">✅ Final Game Checklist — Is It Complete?</div>
+    <ul class="checklist">
+      <li>Start screen appears before gameplay begins</li>
+      <li>Shark moves in 4 directions, stays on stage</li>
+      <li>3 fish types: regular (1pt), golden (3pt, rare), fast (1pt, moves fast)</li>
+      <li>5 hazards: jellyfish (health drain), mine (instant life), pufferfish (poison/slow), octopus (freeze), whirlpool (push)</li>
+      <li>8 variables working: Score, HiScore, Lives, Health, Level, FishSpeed, TimeBonus, PoisonActive</li>
+      <li>6 custom functions: startGame, catchFish(points), loseLife, damageShark(amount), nextLevel, spawnFish</li>
+      <li>6 level backdrops change automatically</li>
+      <li>Enemies unlock progressively by level</li>
+      <li>TimeBonus countdown adds to Score each level</li>
+      <li>Visual health bar changes colour with health</li>
+      <li>Game Over screen shows Score + HiScore, restarts on Space</li>
+      <li>You Win screen appears after Level 6</li>
+      <li>Sound effects for every major event</li>
+      <li>Project shared on Scratch with title, instructions and description</li>
+      <li>You left constructive feedback on two classmates' games</li>
+    </ul>
+
+    <div class="win-box">
+      <div style="font-size:3rem;margin-bottom:10px;">🏆</div>
+      <div style="font-family:'Fredoka One',cursive;font-size:2rem;color:var(--teal2);margin-bottom:10px;">You Did It!</div>
+      <p style="color:var(--dim);font-size:0.92rem;line-height:1.8;max-width:500px;margin:0 auto;">You've built a complete game with 8 variables, 6 custom functions with parameters, 5 types of enemy, 6 changing levels, collision detection, health systems, event-driven programming and a polished UI. That's genuinely impressive — and it's the same set of ideas used in every game ever made.</p>
+    </div>
+  </div>
+</article>
+
+</main>
+
+<footer>
+  <p>🦈 Scratch Game Academy · Year 7 Computer Science · Edexcel GCSE Foundation Skills · Made with Scratch 3.0</p>
+  <p style="margin-top:8px;">© Copyright 2026 — Designed and Created by <strong style="color:var(--teal);">Dr Galan</strong> for <a href="https://coderra.je" target="_blank" style="color:var(--teal2);text-decoration:none;font-weight:700;">Coderra.je</a></p>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
