@@ -3,14 +3,17 @@ import { onMounted, computed } from 'vue'
 import { useSystemLogs } from '../composables/useSystemLogs'
 import { useAiUsage } from '../composables/useAiUsage'
 import { useAiInfo } from '../composables/useAiInfo'
+import { useSnapshots } from '../composables/useSnapshots'
 
 const { logs, loading, error, refresh } = useSystemLogs()
 const { usage, refresh: refreshUsage } = useAiUsage()
 const { info: aiInfo } = useAiInfo()
+const { snapshots, refresh: refreshSnapshots } = useSnapshots()
 
 onMounted(() => {
   refresh(50)
   refreshUsage(7)
+  refreshSnapshots(20)
 })
 
 function levelClass(level: string): string {
@@ -119,6 +122,51 @@ const groupedByEvent = computed(() => {
         </div>
       </div>
       <p v-else class="text-slate-500 text-sm">Loading usage…</p>
+    </section>
+
+    <!-- Snapshots -->
+    <section>
+      <header class="flex items-baseline justify-between mb-3">
+        <h2 class="text-sm font-extrabold uppercase tracking-widest text-slate-500">
+          Recent snapshots
+        </h2>
+        <button
+          type="button"
+          class="text-xs font-bold px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 active:scale-95 transition-all min-h-[2.25rem] focus:outline-none focus-visible:ring-2 focus-visible:ring-pi-green"
+          @click="refreshSnapshots(20)"
+        >
+          Refresh
+        </button>
+      </header>
+
+      <ol
+        v-if="snapshots.length"
+        class="rounded-xl border border-slate-800 bg-slate-900/40 divide-y divide-slate-800 overflow-hidden"
+      >
+        <li
+          v-for="snap in snapshots"
+          :key="snap.id"
+          class="p-4 flex justify-between items-center text-sm gap-3"
+        >
+          <div>
+            <span class="font-mono text-xs text-slate-500">#{{ snap.id }}</span>
+            <span class="ml-2 font-bold text-slate-200">
+              {{ snap.label || '(no label)' }}
+            </span>
+          </div>
+          <div class="text-right shrink-0">
+            <div class="font-mono text-[0.7rem] text-slate-500">
+              {{ new Date(snap.taken_at).toLocaleString() }}
+            </div>
+            <div class="text-xs text-slate-400">
+              {{ snap.count }} sensor{{ snap.count === 1 ? '' : 's' }}
+            </div>
+          </div>
+        </li>
+      </ol>
+      <p v-else class="text-slate-500 text-sm">
+        No snapshots yet. Take one from the Sensors page.
+      </p>
     </section>
 
     <!-- System logs -->

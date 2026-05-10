@@ -65,13 +65,13 @@ When all five containers report healthy:
 
 | Phase | Title | Status |
 | --- | --- | --- |
-| 1 | Core device (hardware, OS, touchscreen) | Planned — runbook ready |
-| 2 | Core services (Docker, MQTT, Node-RED, FastAPI, Vue) | Planned |
-| 3 | MQTT core | Planned |
-| 4 | Database core | Planned |
-| 5 | Dashboard core | Planned |
-| 6 | AI API integration (Claude Haiku, "Explain" button) | Planned |
-| 7 | First module — Classroom Sensor Hub | Planned |
+| 1 | Core device (hardware, OS, touchscreen) | Runbook ready |
+| 2 | Core services (Docker, MQTT, Node-RED, FastAPI, Vue) | Built |
+| 3 | MQTT core | Built |
+| 4 | Database core | Built |
+| 5 | Dashboard core | Built |
+| 6 | AI API integration (Claude Haiku, "Explain" button) | Built |
+| 7 | First module — Classroom Sensor Hub | Built |
 
 ## Working language
 

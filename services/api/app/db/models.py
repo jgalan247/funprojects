@@ -116,6 +116,23 @@ class AiPrompt(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
 
+class Snapshot(Base):
+    """A point-in-time capture of every active sensor reading.
+
+    Used by the classroom-sensor-hub module: students tap a button to
+    freeze the current view for later discussion.
+    """
+
+    __tablename__ = "snapshots"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    taken_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    label: Mapped[str | None] = mapped_column(Text, nullable=True)
+    readings_json: Mapped[str] = mapped_column(Text, nullable=False)
+
+    __table_args__ = (Index("ix_snapshots_taken_at", "taken_at"),)
+
+
 class AiResponse(Base):
     """Reserved for Phase 6 — see :class:`AiPrompt`."""
 
