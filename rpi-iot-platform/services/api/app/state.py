@@ -21,6 +21,7 @@ class Reading:
     quality: str
     ts: datetime          # the wall-clock the publisher claims
     received_at: datetime # the wall-clock the API actually received it
+    topic: str            # the originating MQTT topic — needed to register sensors
 
 
 def reading_to_dict(r: Reading) -> dict:

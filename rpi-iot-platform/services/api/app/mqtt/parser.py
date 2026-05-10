@@ -81,4 +81,5 @@ def parse_envelope(topic: str, payload: bytes | str) -> Reading:
         quality=quality,
         ts=ts,
         received_at=datetime.now(timezone.utc),
+        topic=topic,
     )

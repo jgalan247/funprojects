@@ -1,3 +1,7 @@
 fastapi==0.115.4
 uvicorn[standard]==0.32.0
 aiomqtt==2.3.0
+SQLAlchemy[asyncio]==2.0.35
+aiosqlite==0.20.0
+alembic==1.13.3
+APScheduler==3.10.4
