@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 1 &middot; Build Your Pi &mdash; Pi IoT Academy</title>
+<meta name="description" content="Phase 1 of the Pi IoT Academy: flash Raspberry Pi OS, set up the touchscreen, secure SSH, and verify your power bank.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="phase" data-phase="phase-1">
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="brand" aria-label="Pi IoT Academy home">
+      <span class="brand-logo" aria-hidden="true">Pi</span>
+      <span>
+        <span class="brand-name">Pi IoT Academy</span><br>
+        <span class="brand-sub">Phase 1 &middot; Build Your Pi</span>
+      </span>
+    </a>
+    <nav class="topnav">
+      <a href="index.html">All phases</a>
+      <span class="progress-pill" data-progress-pill>0 / 0 done</span>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="container">
+      <p style="color: var(--text-faint); font-family: var(--font-mono); font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase; margin: 0 0 6px;">
+        Phase 01
+      </p>
+      <h1>Build your <span class="accent">Pi</span>.</h1>
+      <p class="lede">
+        In this phase you&rsquo;ll turn a brand-new Raspberry Pi into a
+        working portable computer with a touchscreen. Once you finish, your
+        Pi will boot anywhere &mdash; on a desk, on a battery, in a corridor.
+        That&rsquo;s the foundation for everything else.
+      </p>
+      <div class="hero-meta">
+        <span class="tag tag-time"><span class="dot"></span>~60&ndash;90 min</span>
+        <span class="tag tag-difficulty"><span class="dot"></span>Difficulty: 2 / 3</span>
+        <span class="tag"><span class="dot"></span>Work in pairs</span>
+        <span class="tag"><span class="dot"></span>Hardware lesson</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <div class="phase-layout">
+
+      <aside class="toc" aria-label="Steps in this phase">
+        <p class="toc-title">In this phase</p>
+        <ol>
+          <li><a href="#what-you-need">What you need</a></li>
+          <li><a href="#step-1">1. Flash the SD card</a></li>
+          <li><a href="#step-2">2. First boot</a></li>
+          <li><a href="#step-3">3. The touchscreen</a></li>
+          <li><a href="#step-4">4. Lock down SSH</a></li>
+          <li><a href="#step-5">5. Test the power bank</a></li>
+          <li><a href="#step-6">6. Verify everything</a></li>
+          <li><a href="#next">What&rsquo;s next</a></li>
+        </ol>
+      </aside>
+
+      <article>
+
+        <!-- WHAT YOU NEED ============================================== -->
+
+        <section id="what-you-need" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">0</div>
+            <div class="step-title-block">
+              <h3>What you need</h3>
+              <div class="step-meta">
+                <span>Get this all on your desk before you start.</span>
+              </div>
+            </div>
+          </div>
+          <div class="step-body">
+            <div class="bom-grid">
+              <div class="bom-item">
+                <div class="bom-item-name">Raspberry Pi 4B (8 GB)</div>
+                <div class="bom-item-note">The brain. Smaller models won&rsquo;t do for this course.</div>
+              </div>
+              <div class="bom-item">
+                <div class="bom-item-name">Official 5&Prime; touchscreen</div>
+                <div class="bom-item-note">DSI connector + 4 jumper wires for power.</div>
+              </div>
+              <div class="bom-item">
+                <div class="bom-item-name">microSD card, 32 GB, A2</div>
+                <div class="bom-item-note">SanDisk Extreme or similar. Slow cards make a slow Pi.</div>
+              </div>
+              <div class="bom-item">
+                <div class="bom-item-name">Official 27 W USB-C PSU</div>
+                <div class="bom-item-note">For the desk. The battery comes later.</div>
+              </div>
+              <div class="bom-item">
+                <div class="bom-item-name">USB-C power bank</div>
+                <div class="bom-item-note">At least 10 000 mAh and 5 V / 3 A. We&rsquo;ll test it in step 5.</div>
+              </div>
+              <div class="bom-item">
+                <div class="bom-item-name">microHDMI &rarr; HDMI cable</div>
+                <div class="bom-item-note">Backup display for the very first boot.</div>
+              </div>
+              <div class="bom-item">
+                <div class="bom-item-name">USB keyboard &amp; mouse</div>
+                <div class="bom-item-note">Only needed for first boot. SSH from then on.</div>
+              </div>
+              <div class="bom-item">
+                <div class="bom-item-name">Ethernet cable (optional)</div>
+                <div class="bom-item-note">Useful if Wi-Fi isn&rsquo;t cooperating.</div>
+              </div>
+            </div>
+            <div class="callout teacher" style="margin-top: 18px;">
+              <div class="callout-icon" aria-hidden="true">T</div>
+              <div class="callout-body">
+                <div class="callout-title">A teacher will help with</div>
+                <p>Handing out parts and checking everything is present before you start. If anything is missing, raise a hand &mdash; don&rsquo;t improvise with parts from another kit.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 1 ===================================================== -->
+
+        <section id="step-1" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">1</div>
+            <div class="step-title-block">
+              <h3>Flash the SD card</h3>
+              <div class="step-meta"><span>~10 minutes</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>The SD card is the Pi&rsquo;s &ldquo;hard drive&rdquo;. Right now it&rsquo;s empty. We need to write the operating system &mdash; <strong>Raspberry Pi OS 64-bit</strong> &mdash; onto it.</p>
+
+            <ol>
+              <li>Plug the microSD card into the laptop using the supplied adaptor.</li>
+              <li>Open <strong>Raspberry Pi Imager</strong>. (Already installed on the classroom laptops. If not, download it from <code>raspberrypi.com/software</code>.)</li>
+              <li>Click <strong>Choose device</strong> &rarr; <em>Raspberry Pi 4</em>.</li>
+              <li>Click <strong>Choose OS</strong> &rarr; <em>Raspberry Pi OS (64-bit)</em>. Make sure it says &ldquo;with desktop&rdquo;, not &ldquo;Lite&rdquo;.</li>
+              <li>Click <strong>Choose storage</strong> and pick the SD card. <strong>Be careful here</strong> &mdash; if you choose the wrong drive you can wipe the laptop.</li>
+              <li>Click <strong>Next</strong>, then <strong>Edit settings</strong>. Fill in:
+                <ul>
+                  <li><strong>Hostname:</strong> <code>pi-iot-XX</code> (where XX is your kit number).</li>
+                  <li><strong>Username:</strong> <code>coderra</code>.</li>
+                  <li><strong>Password:</strong> a strong one. <em>Write it down somewhere safe</em>.</li>
+                  <li><strong>Wireless LAN:</strong> the school Wi-Fi name and password. Country: <code>GB</code>.</li>
+                  <li><strong>Locale:</strong> timezone <code>Europe/Jersey</code>, keyboard layout <code>gb</code>.</li>
+                  <li>On the <strong>Services</strong> tab: tick <strong>Enable SSH</strong> with password authentication.</li>
+                </ul>
+              </li>
+              <li>Save the settings, click <strong>Yes</strong>, and let the Imager write the card. This takes 4&ndash;6 minutes.</li>
+              <li>When it says &ldquo;Write successful&rdquo;, eject the SD card.</li>
+            </ol>
+
+            <div class="callout warn">
+              <div class="callout-icon" aria-hidden="true">!</div>
+              <div class="callout-body">
+                <div class="callout-title">Double-check the storage drive</div>
+                <p>Choosing the wrong drive will erase whatever is on it. The SD card is usually small (16&ndash;64 GB). If you see a 500 GB drive, that&rsquo;s the laptop &mdash; not the card.</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-1">
+                <span class="check-text">SD card flashed with Raspberry Pi OS 64-bit and pre-configured.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 2 ===================================================== -->
+
+        <section id="step-2" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">2</div>
+            <div class="step-title-block">
+              <h3>First boot &amp; first update</h3>
+              <div class="step-meta"><span>~15 minutes</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>Time to power the Pi on for the first time and bring it up to date.</p>
+
+            <ol>
+              <li>Insert the SD card into the slot on the back of the Pi.</li>
+              <li>Connect the microHDMI cable to <strong>HDMI 0</strong> (the one closest to the USB-C port) and the other end to a monitor.</li>
+              <li>Plug in the keyboard and mouse.</li>
+              <li>Plug in the official USB-C power supply <em>last</em>. The Pi has no power button &mdash; it boots as soon as it gets power.</li>
+              <li>Wait for the desktop to appear. The first boot is slower than later ones.</li>
+            </ol>
+
+            <p>Once you see the desktop, open a <strong>Terminal</strong> (the icon that looks like <code>&gt;_</code>) and run:</p>
+
+            <div class="code-block">
+              <div class="code-block-header">
+                <span>terminal &middot; on the Pi</span>
+                <button class="copy-btn" type="button">Copy</button>
+              </div>
+              <pre><code>sudo apt update
+sudo apt full-upgrade -y
+sudo reboot</code></pre>
+            </div>
+
+            <p>This downloads the latest security updates and restarts the Pi. It can take 5&ndash;10 minutes the first time. You can read on while it works.</p>
+
+            <div class="callout info">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">What does <code>sudo</code> mean?</div>
+                <p><strong>S</strong>uper<strong>u</strong>ser <strong>do</strong>. It runs a command as the &ldquo;administrator&rdquo; user, which is needed for changing the system. The Pi will ask for your password the first time you use it.</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-2">
+                <span class="check-text">Pi boots to the desktop and finishes <code>apt full-upgrade</code> with no errors.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 3 ===================================================== -->
+
+        <section id="step-3" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">3</div>
+            <div class="step-title-block">
+              <h3>Connect the touchscreen</h3>
+              <div class="step-meta"><span>~15 minutes &middot; Be gentle</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>The official 5&Prime; touchscreen connects to the Pi with one ribbon cable (called <strong>DSI</strong>) and four small jumper wires for power.</p>
+
+            <div class="callout warn">
+              <div class="callout-icon" aria-hidden="true">!</div>
+              <div class="callout-body">
+                <div class="callout-title">Power off first</div>
+                <p>Always unplug the power supply before touching the ribbon cables. Connecting them while the Pi is on can damage both boards.</p>
+              </div>
+            </div>
+
+            <ol>
+              <li>Unplug the Pi&rsquo;s power supply.</li>
+              <li>Find the <strong>DSI</strong> port on the Pi (a thin slot labelled &ldquo;DISPLAY&rdquo; or &ldquo;DSI&rdquo;).</li>
+              <li>Open the connector by pulling the black tab gently outward.</li>
+              <li>Slide the ribbon cable in <strong>silver-side facing the USB ports</strong>. It only fits one way.</li>
+              <li>Push the black tab back in to lock it.</li>
+              <li>Do the same on the touchscreen&rsquo;s connector.</li>
+              <li>Connect the four jumper wires for power: <code>5V &rarr; 5V</code>, <code>GND &rarr; GND</code>, <code>SDA &rarr; SDA</code>, <code>SCL &rarr; SCL</code>. The labels are printed on both boards.</li>
+              <li>Plug in the power supply.</li>
+            </ol>
+
+            <p>The touchscreen should light up and show the desktop after about 30 seconds. Try tapping the screen &mdash; you should see the cursor move and clicks register.</p>
+
+            <p>If the screen is upside down (depending on how it&rsquo;s mounted), open a terminal and edit the boot config:</p>
+
+            <div class="code-block">
+              <div class="code-block-header">
+                <span>terminal &middot; only if the screen is upside down</span>
+                <button class="copy-btn" type="button">Copy</button>
+              </div>
+              <pre><code>sudo nano /boot/firmware/config.txt</code></pre>
+            </div>
+
+            <p>Find the line <code>[all]</code> and add this just below it:</p>
+
+            <div class="code-block">
+              <div class="code-block-header">
+                <span>config.txt</span>
+                <button class="copy-btn" type="button">Copy</button>
+              </div>
+              <pre><code>display_lcd_rotate=2</code></pre>
+            </div>
+
+            <p>Save with <code>Ctrl+O</code>, <code>Enter</code>, then exit with <code>Ctrl+X</code>. Reboot.</p>
+
+            <div class="callout teacher">
+              <div class="callout-icon" aria-hidden="true">T</div>
+              <div class="callout-body">
+                <div class="callout-title">A teacher will help with</div>
+                <p>Connecting the ribbon cable for the first time. It&rsquo;s fragile and the connector is fiddly. Don&rsquo;t force it.</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-3">
+                <span class="check-text">Touchscreen shows the desktop and responds to touch in the right orientation.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 4 ===================================================== -->
+
+        <section id="step-4" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">4</div>
+            <div class="step-title-block">
+              <h3>Lock down SSH</h3>
+              <div class="step-meta"><span>~10 minutes &middot; Done from the laptop</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>SSH is how you log into the Pi from another computer over the network. Right now it accepts a password. We&rsquo;re going to upgrade it to use a <strong>key</strong> instead &mdash; a pair of files that work like a much, much longer password no one can guess.</p>
+
+            <p>Open a terminal <strong>on your laptop</strong> (not the Pi) and run:</p>
+
+            <div class="code-block">
+              <div class="code-block-header">
+                <span>terminal &middot; on the laptop</span>
+                <button class="copy-btn" type="button">Copy</button>
+              </div>
+              <pre><code>ssh-keygen -t ed25519 -C "pi-iot-XX" -f ~/.ssh/pi_iot_XX</code></pre>
+            </div>
+
+            <p>Press <kbd>Enter</kbd> when it asks for a passphrase (leave it empty for the classroom). This makes two files in your <code>~/.ssh</code> folder: a private key (keep secret) and a public key (safe to share).</p>
+
+            <p>Copy the public key to the Pi:</p>
+
+            <div class="code-block">
+              <div class="code-block-header">
+                <span>terminal &middot; on the laptop</span>
+                <button class="copy-btn" type="button">Copy</button>
+              </div>
+              <pre><code>ssh-copy-id -i ~/.ssh/pi_iot_XX.pub coderra@pi-iot-XX.local</code></pre>
+            </div>
+
+            <p>It will ask for the Pi&rsquo;s password one last time. Now log in with the key:</p>
+
+            <div class="code-block">
+              <div class="code-block-header">
+                <span>terminal &middot; on the laptop</span>
+                <button class="copy-btn" type="button">Copy</button>
+              </div>
+              <pre><code>ssh -i ~/.ssh/pi_iot_XX coderra@pi-iot-XX.local</code></pre>
+            </div>
+
+            <p>You should be in <em>without typing a password</em>. From the Pi shell, turn password login off:</p>
+
+            <div class="code-block">
+              <div class="code-block-header">
+                <span>terminal &middot; on the Pi</span>
+                <button class="copy-btn" type="button">Copy</button>
+              </div>
+              <pre><code>echo "PasswordAuthentication no" | sudo tee /etc/ssh/sshd_config.d/99-iot.conf
+echo "PermitRootLogin no" | sudo tee -a /etc/ssh/sshd_config.d/99-iot.conf
+sudo systemctl restart ssh</code></pre>
+            </div>
+
+            <p>From now on, only your laptop&rsquo;s key can log in. Test it: open a new laptop terminal and try to SSH again. It should work without a password. Try removing the <code>-i</code> flag &mdash; if SSH falls back to asking for a password, lock-down didn&rsquo;t take.</p>
+
+            <div class="callout info">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">Why turn passwords off?</div>
+                <p>Passwords can be guessed by automated bots scanning the internet. Keys are 256-bit random numbers &mdash; even a supercomputer would take billions of years.</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-4">
+                <span class="check-text">Key login works; password login is refused.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 5 ===================================================== -->
+
+        <section id="step-5" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">5</div>
+            <div class="step-title-block">
+              <h3>Test the power bank</h3>
+              <div class="step-meta"><span>~10 minutes</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>The Pi is portable, but only if the battery can keep up. A weak power bank causes the screen to flicker, the SD card to corrupt, or the Pi to reboot under load. We&rsquo;re going to check yours <em>before</em> trusting it in a lesson.</p>
+
+            <p>Charge the power bank fully. Then:</p>
+
+            <ol>
+              <li>Unplug the official PSU.</li>
+              <li>Plug the power bank into the Pi&rsquo;s USB-C port.</li>
+              <li>Wait for the touchscreen to come up. Use it for 5 minutes &mdash; tap around, open the browser, watch a video on the BBC website.</li>
+            </ol>
+
+            <p>Then SSH into the Pi and run:</p>
+
+            <div class="code-block">
+              <div class="code-block-header">
+                <span>terminal &middot; on the Pi</span>
+                <button class="copy-btn" type="button">Copy</button>
+              </div>
+              <pre><code>vcgencmd get_throttled</code></pre>
+            </div>
+
+            <p>You want to see this:</p>
+
+            <div class="code-block">
+              <div class="code-block-header">
+                <span>good output</span>
+                <button class="copy-btn" type="button">Copy</button>
+              </div>
+              <pre><code>throttled=0x0</code></pre>
+            </div>
+
+            <p><code>0x0</code> means <em>everything is fine</em>. Anything else (e.g. <code>0x50000</code>, <code>0x50005</code>) means the Pi noticed an under-voltage event. The bank or the cable can&rsquo;t keep up.</p>
+
+            <div class="callout warn">
+              <div class="callout-icon" aria-hidden="true">!</div>
+              <div class="callout-body">
+                <div class="callout-title">If you see anything other than <code>0x0</code></div>
+                <p>Try a different USB-C cable first &mdash; cheap cables are often the problem. If that doesn&rsquo;t help, the power bank isn&rsquo;t up to it. Tell a teacher and swap it out.</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-5">
+                <span class="check-text">Pi runs from the power bank for 5 minutes; <code>get_throttled</code> reports <code>0x0</code>.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 6 / FINAL CHECKLIST ================================== -->
+
+        <section id="step-6" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">6</div>
+            <div class="step-title-block">
+              <h3>Final verification</h3>
+              <div class="step-meta"><span>5 minutes</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>Walk through this list before you call Phase 1 done. If anything is missing, fix it now &mdash; later phases assume all of this works.</p>
+
+            <div class="final-checklist">
+              <h3>Phase 1 sign-off</h3>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-1">
+                  <span class="check-text">The Pi boots reliably to the desktop on the touchscreen.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-2">
+                  <span class="check-text">Wi-Fi connects automatically after a reboot.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-3">
+                  <span class="check-text">SSH from the laptop works using a key, and password login is refused.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-4">
+                  <span class="check-text">The Pi runs from the power bank for at least 10 minutes with no under-voltage warnings.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-5">
+                  <span class="check-text">The hostname is correct (<code>hostname</code> on the Pi shows <code>pi-iot-XX</code>).</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-6">
+                  <span class="check-text">The Pi is fully updated (<code>apt full-upgrade</code> reports nothing to do).</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- NEXT ====================================================== -->
+
+        <section id="next" class="next-up">
+          <h3>Phase 1 complete?</h3>
+          <p>Brilliant. You&rsquo;ve got a working Raspberry Pi &mdash; updated, secure, portable. Next phase: install all the software it needs to become a proper IoT lab.</p>
+          <a href="index.html" class="btn disabled" data-require-all-checked aria-disabled="true">Phase 2: Install the platform &nbsp;&rarr;</a>
+          <p style="margin-top: 14px; color: var(--text-faint); font-size: 0.88rem;">
+            (Phase 2 unlocks here when you&rsquo;ve ticked every box above. It&rsquo;s not built yet &mdash; we&rsquo;re writing it next lesson.)
+          </p>
+        </section>
+
+      </article>
+
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <span>&copy; Coderra.je &middot; Designed for Haute Vall&eacute;e School</span>
+    <span>Phase 1 of 7 &middot; Pi IoT Academy</span>
+  </div>
+</footer>
+
+<script src="js/main.js" defer></script>
+</body>
+</html>
