@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pi IoT Academy — Build a Raspberry Pi IoT &amp; AI Lab</title>
+<meta name="description" content="Build a portable Raspberry Pi IoT and AI lab from scratch. A seven-phase course for Year 8&ndash;9 students by Coderra.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="landing">
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="brand" aria-label="Pi IoT Academy home">
+      <span class="brand-logo" aria-hidden="true">Pi</span>
+      <span>
+        <span class="brand-name">Pi IoT Academy</span><br>
+        <span class="brand-sub">Coderra &middot; Year 8&ndash;9</span>
+      </span>
+    </a>
+    <nav class="topnav">
+      <a href="index.html" class="active">Phases</a>
+      <a href="../docs/architecture.md">Architecture</a>
+      <a href="../docs/hardware-runbook.md">Runbook</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="container">
+      <h1>Build a <span class="accent">Raspberry Pi</span> IoT &amp; AI lab.</h1>
+      <p class="lede">
+        Across seven phases you&rsquo;ll turn a Raspberry Pi 4B into a portable
+        teaching terminal &mdash; a touchscreen device that reads sensors,
+        speaks the language of the internet (MQTT), stores data in a real
+        database, and asks Claude to explain what the readings mean.
+      </p>
+      <div class="hero-meta">
+        <span class="tag tag-time"><span class="dot"></span>~7 lessons total</span>
+        <span class="tag tag-difficulty"><span class="dot"></span>Year 8&ndash;9</span>
+        <span class="tag"><span class="dot"></span>Hardware + code</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="container">
+    <h2 style="margin-top: 32px;">Choose a phase</h2>
+    <p style="color: var(--text-dim); max-width: 70ch;">
+      Work through the phases in order. Each one builds on the last. Tick off
+      the steps as you go &mdash; the website remembers where you got to so
+      you can pick up next lesson.
+    </p>
+
+    <div class="phase-grid">
+
+      <article class="phase-card active" data-phase-key="phase-1">
+        <span class="phase-status live">Available</span>
+        <a href="phase-1.html">
+          <span class="phase-num">Phase 01</span>
+          <h3 class="phase-title">Build your Pi</h3>
+          <p class="phase-desc">
+            Flash the SD card, set up the touchscreen, secure SSH, and check
+            your power bank. By the end you&rsquo;ll have a Pi that boots
+            anywhere.
+          </p>
+          <span class="phase-cta">
+            Start building &rarr;
+          </span>
+          <span class="phase-cta" data-progress-indicator style="color: var(--text-faint); font-weight: 500;"></span>
+        </a>
+      </article>
+
+      <article class="phase-card locked" data-phase-key="phase-2">
+        <span class="phase-status soon">Coming soon</span>
+        <span class="phase-num">Phase 02</span>
+        <h3 class="phase-title">Install the platform</h3>
+        <p class="phase-desc">
+          Install Docker and bring up the five core services with a single
+          command: Mosquitto, Node-RED, FastAPI, the AI service, and the Vue
+          dashboard.
+        </p>
+        <span class="phase-cta">Locked</span>
+      </article>
+
+      <article class="phase-card locked" data-phase-key="phase-3">
+        <span class="phase-status soon">Coming soon</span>
+        <span class="phase-num">Phase 03</span>
+        <h3 class="phase-title">Talk over MQTT</h3>
+        <p class="phase-desc">
+          Send your first sensor reading from a laptop into the Pi. Watch it
+          appear on the touchscreen in real time.
+        </p>
+        <span class="phase-cta">Locked</span>
+      </article>
+
+      <article class="phase-card locked" data-phase-key="phase-4">
+        <span class="phase-status soon">Coming soon</span>
+        <span class="phase-num">Phase 04</span>
+        <h3 class="phase-title">Save your data</h3>
+        <p class="phase-desc">
+          Add a real database. Sensor readings are saved every second so you
+          can come back and look at the history.
+        </p>
+        <span class="phase-cta">Locked</span>
+      </article>
+
+      <article class="phase-card locked" data-phase-key="phase-5">
+        <span class="phase-status soon">Coming soon</span>
+        <span class="phase-num">Phase 05</span>
+        <h3 class="phase-title">Design the dashboard</h3>
+        <p class="phase-desc">
+          Build a touchscreen interface with Vue and Tailwind. Big buttons,
+          live charts, and a navigation a Year 7 could use.
+        </p>
+        <span class="phase-cta">Locked</span>
+      </article>
+
+      <article class="phase-card locked" data-phase-key="phase-6">
+        <span class="phase-status soon">Coming soon</span>
+        <span class="phase-num">Phase 06</span>
+        <h3 class="phase-title">Ask Claude</h3>
+        <p class="phase-desc">
+          Add an &ldquo;Explain&rdquo; button on each sensor card. Claude
+          Haiku turns the raw numbers into a friendly explanation.
+        </p>
+        <span class="phase-cta">Locked</span>
+      </article>
+
+      <article class="phase-card locked" data-phase-key="phase-7">
+        <span class="phase-status soon">Coming soon</span>
+        <span class="phase-num">Phase 07</span>
+        <h3 class="phase-title">Your first module</h3>
+        <p class="phase-desc">
+          Connect a Micro:bit or ESP32. Build the Classroom Sensor Hub: live
+          readings, trend charts, and AI explanations &mdash; ready to demo
+          to your class.
+        </p>
+        <span class="phase-cta">Locked</span>
+      </article>
+
+    </div>
+
+    <section style="margin: 40px 0 24px;">
+      <h2>Why we&rsquo;re building this</h2>
+      <p style="color: var(--text-dim); max-width: 72ch;">
+        IoT means the &ldquo;Internet of Things&rdquo; &mdash; everyday
+        objects that send data to each other. Your phone, your smart speaker,
+        the temperature sensor in a greenhouse. By the end of this course
+        you&rsquo;ll understand how that works because you&rsquo;ll have
+        built one yourself, from the SD card up. You&rsquo;ll learn:
+      </p>
+      <ul style="color: var(--text-dim); max-width: 72ch;">
+        <li>How to set up a small computer (a Raspberry Pi) from scratch.</li>
+        <li>How sensors talk to each other using a protocol called MQTT.</li>
+        <li>How to store data in a database and view it on a screen.</li>
+        <li>How to use an AI like Claude through an API to explain data.</li>
+      </ul>
+    </section>
+
+  </section>
+
+</main>
+
+<footer>
+  <div class="container">
+    <span>&copy; Coderra.je &middot; Designed for Haute Vall&eacute;e School</span>
+    <span>Pi IoT Academy &middot; v0.1</span>
+  </div>
+</footer>
+
+<script src="js/main.js" defer></script>
+</body>
+</html>
