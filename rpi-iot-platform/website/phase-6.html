@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 6 &middot; Ask Claude &mdash; Pi IoT Academy</title>
+<meta name="description" content="Phase 6 of the Pi IoT Academy: wire up Claude Haiku, add an Explain button to each sensor card, log prompts and responses, and watch token usage in the dashboard.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="phase" data-phase="phase-6">
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="brand" aria-label="Pi IoT Academy home">
+      <span class="brand-logo" aria-hidden="true">Pi</span>
+      <span>
+        <span class="brand-name">Pi IoT Academy</span><br>
+        <span class="brand-sub">Phase 6 &middot; Ask Claude</span>
+      </span>
+    </a>
+    <nav class="topnav">
+      <a href="index.html">All phases</a>
+      <span class="progress-pill" data-progress-pill>0 / 0 done</span>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="container">
+      <p style="color: var(--text-faint); font-family: var(--font-mono); font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase; margin: 0 0 6px;">
+        Phase 06
+      </p>
+      <h1>Ask <span class="accent">Claude</span>.</h1>
+      <p class="lede">
+        Numbers on a screen tell you the temperature is 24&nbsp;°C. They don&rsquo;t tell you what that <em>means</em>. In this phase you&rsquo;ll add an &ldquo;Explain&rdquo; button to every sensor card. Tap it and Claude Haiku writes a friendly two-sentence explanation in plain English &mdash; live, in under four seconds.
+      </p>
+      <div class="hero-meta">
+        <span class="tag tag-time"><span class="dot"></span>~45&ndash;60 min</span>
+        <span class="tag tag-difficulty"><span class="dot"></span>Difficulty: 2 / 3</span>
+        <span class="tag"><span class="dot"></span>You'll need an API key</span>
+        <span class="tag"><span class="dot"></span>AI lesson</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <div class="phase-layout">
+
+      <aside class="toc" aria-label="Steps in this phase">
+        <p class="toc-title">In this phase</p>
+        <ol>
+          <li><a href="#concept">How the AI service works</a></li>
+          <li><a href="#step-1">1. Pull &amp; rebuild</a></li>
+          <li><a href="#step-2">2. Try the offline stub</a></li>
+          <li><a href="#step-3">3. Get an API key</a></li>
+          <li><a href="#step-4">4. Switch to real Claude</a></li>
+          <li><a href="#step-5">5. Look at the prompts</a></li>
+          <li><a href="#step-6">6. Watch token usage</a></li>
+          <li><a href="#step-7">7. Final verification</a></li>
+          <li><a href="#next">What&rsquo;s next</a></li>
+        </ol>
+      </aside>
+
+      <article>
+
+        <!-- CONCEPT =================================================== -->
+
+        <section id="concept" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">0</div>
+            <div class="step-title-block">
+              <h3>How the AI service works</h3>
+              <div class="step-meta"><span>Read this first.</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>You&rsquo;re going to use a <strong>Large Language Model</strong> (LLM) called <strong>Claude</strong>, made by a company called Anthropic. An LLM is a program that&rsquo;s read most of the internet and can write text in response to a prompt. We&rsquo;re going to use it as a friendly explainer.</p>
+
+            <p>Here&rsquo;s the path a button-tap takes:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>flow</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>browser tap
+   ↓ POST /api/ai/explain { sensor_id }
+API service                   (looks up the latest reading)
+   ↓ POST /ai/explain { sensor_id, reading }
+AI service                    (renders the prompt template)
+   ↓ HTTPS
+Anthropic Claude Hauiku       (returns a short explanation)
+   ↓ stores ai_prompts, ai_responses rows
+   ↓ returns text + tokens + latency
+browser shows it</code></pre>
+            </div>
+
+            <div class="bom-grid">
+              <div class="bom-item">
+                <div class="bom-item-name">Why a separate service?</div>
+                <div class="bom-item-note">The Anthropic API key only lives in one container. The main API doesn&rsquo;t even know how to call Claude &mdash; it just forwards the request.</div>
+              </div>
+              <div class="bom-item">
+                <div class="bom-item-name">Why Haiku, not Opus?</div>
+                <div class="bom-item-note">Haiku is the smallest and fastest Claude. For 2&ndash;3 sentence explanations it&rsquo;s plenty &mdash; and roughly 15&times; cheaper per call than the big models.</div>
+              </div>
+              <div class="bom-item">
+                <div class="bom-item-name">Why a template?</div>
+                <div class="bom-item-note">Every call uses the same instructions (&ldquo;You are a friendly science teacher explaining to Year 7 students…&rdquo;) with just the reading values swapped in. Versioned, reusable, easy to tweak.</div>
+              </div>
+              <div class="bom-item">
+                <div class="bom-item-name">Why log prompts &amp; responses?</div>
+                <div class="bom-item-note">Cost tracking. If something goes wrong you can replay it. And it&rsquo;s honest &mdash; teachers can see exactly what was asked and what came back.</div>
+              </div>
+            </div>
+
+            <div class="callout info" style="margin-top: 16px;">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">No API key? Still works.</div>
+                <p>If you don&rsquo;t have an Anthropic API key, the AI service uses a <strong>stub</strong> &mdash; it returns a canned message about the reading instead of calling Claude. The whole pipeline still runs, prompts and responses still get logged. You can do the entire phase that way and add a real key later.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 1: pull + build ====================================== -->
+
+        <section id="step-1" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">1</div>
+            <div class="step-title-block">
+              <h3>Pull and rebuild</h3>
+              <div class="step-meta"><span>~5 minutes &middot; on the Pi</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>The AI service has new code (Anthropic SDK, prompt template, persistence) and the API has a new dependency (httpx for forwarding). Rebuild both:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>terminal &middot; on the Pi</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>cd /opt/iot-platform
+git pull
+docker compose build api ai frontend
+docker compose up -d</code></pre>
+            </div>
+
+            <p>Watch the AI service come up:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>terminal &middot; on the Pi</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>docker compose logs -f ai</code></pre>
+            </div>
+
+            <p>You should see a line that says <code>loaded template explain-sensor-v1</code>. If <code>ANTHROPIC_API_KEY</code> is empty in <code>.env</code>, you&rsquo;ll also see a warning about using the offline stub. Both are fine for this step.</p>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-1">
+                <span class="check-text">AI service logs show <code>loaded template explain-sensor-v1</code>.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 2: stub ============================================== -->
+
+        <section id="step-2" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">2</div>
+            <div class="step-title-block">
+              <h3>Try the offline stub</h3>
+              <div class="step-meta"><span>~5 minutes</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>Make sure the test publisher is running on your laptop (Phase 3 still applies). Open the dashboard and tap a sensor card to open the chart modal. At the bottom you&rsquo;ll see a new <strong>AI explanation</strong> section with an &ldquo;Explain this reading&rdquo; button.</p>
+
+            <p>If <code>ANTHROPIC_API_KEY</code> is empty, you&rsquo;ll also see a yellow <strong>OFFLINE</strong> tag next to the section heading. That&rsquo;s the stub mode.</p>
+
+            <p>Tap the button. Within a second you should see a canned message like:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>stub response</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>AI explanations are disabled — no Anthropic API key configured.
+Sample reading: temperature: 24.3 celsius (from microbit-test-01).</code></pre>
+            </div>
+
+            <p>Below the message you&rsquo;ll see <code>echo-stub</code>, a token count of <code>0 → 0</code>, and a tiny latency. That&rsquo;s the stub&rsquo;s fingerprint &mdash; no real model was called.</p>
+
+            <div class="callout info">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">Why bother with a stub at all?</div>
+                <p>Three reasons. Cost &mdash; you don&rsquo;t pay to test the UI. Privacy &mdash; demo videos don&rsquo;t leak data to a third party. And reliability &mdash; if Claude is down, the dashboard still works, it just shows a less interesting message.</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-2">
+                <span class="check-text">Tapping &ldquo;Explain&rdquo; in stub mode returns a canned message and the offline tag is visible.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 3: API key =========================================== -->
+
+        <section id="step-3" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">3</div>
+            <div class="step-title-block">
+              <h3>Get an API key</h3>
+              <div class="step-meta"><span>~10 minutes &middot; with a teacher</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <div class="callout teacher">
+              <div class="callout-icon" aria-hidden="true">T</div>
+              <div class="callout-body">
+                <div class="callout-title">Your teacher will provide</div>
+                <p>The API key. You don&rsquo;t need your own &mdash; the school account holds it, and you&rsquo;ll be given a key that&rsquo;s only for the IoT lab. <strong>Never put a personal API key on a shared Pi.</strong></p>
+              </div>
+            </div>
+
+            <p>An API key is a long string of letters and numbers, like a very serious password. It identifies your school&rsquo;s account when the AI service calls Claude. Examples:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>example shape</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>sk-ant-api03-aBcDeF...long...string</code></pre>
+            </div>
+
+            <div class="callout warn">
+              <div class="callout-icon" aria-hidden="true">!</div>
+              <div class="callout-body">
+                <div class="callout-title">Treat it like a password</div>
+                <p>Don&rsquo;t commit it to git. Don&rsquo;t paste it in chat. Don&rsquo;t screenshot it. The <code>.env</code> file is gitignored on purpose &mdash; the key only lives there and inside the running container.</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-3">
+                <span class="check-text">I have an API key from my teacher (or I&rsquo;m sticking with the stub mode for this lesson).</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 4: real Claude ======================================= -->
+
+        <section id="step-4" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">4</div>
+            <div class="step-title-block">
+              <h3>Switch to real Claude</h3>
+              <div class="step-meta"><span>~5 minutes &middot; on the Pi</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>SSH into the Pi and edit <code>.env</code>:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>terminal &middot; on the Pi</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>cd /opt/iot-platform
+nano .env</code></pre>
+            </div>
+
+            <p>Find the line <code>ANTHROPIC_API_KEY=</code> and paste your key after the equals sign. Save with <code>Ctrl+O</code>, <code>Enter</code>, then <code>Ctrl+X</code>.</p>
+
+            <p>Restart only the AI service so it picks up the new key:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>terminal &middot; on the Pi</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>docker compose up -d ai</code></pre>
+            </div>
+
+            <p>Check the logs &mdash; the warning about &ldquo;using offline stub&rdquo; should be gone. You should instead see <code>Anthropic ready (claude-haiku-4-5-20251001)</code>.</p>
+
+            <p>Back to the dashboard. Open a sensor card&rsquo;s modal again. The yellow <strong>OFFLINE</strong> tag should now be gone. Tap <strong>Explain this reading</strong>.</p>
+
+            <p>This time the response should be something like:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>Claude response</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>The temperature from microbit-test-01 is 22.4 °C, which is a comfortable
+classroom temperature. Nothing unusual — typical of a heated room on a
+spring day.</code></pre>
+            </div>
+
+            <p>Look at the small grey line below the text: <code>claude-haiku-4-5-20251001 · 178 → 41 tok · 612 ms</code>. That&rsquo;s the model name, the input/output token count, and how long Claude took to respond. Your numbers will differ but the shape will match.</p>
+
+            <div class="callout info">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">Tap it again</div>
+                <p>Each tap is a fresh call &mdash; you&rsquo;ll get slightly different wording each time. That&rsquo;s normal: LLMs are probabilistic. The <em>meaning</em> stays the same.</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-4">
+                <span class="check-text">Tapping &ldquo;Explain&rdquo; returns a fresh, natural English explanation; the offline tag is gone.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 5: prompts =========================================== -->
+
+        <section id="step-5" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">5</div>
+            <div class="step-title-block">
+              <h3>Look at the prompts</h3>
+              <div class="step-meta"><span>~5 minutes</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>Every &ldquo;Explain&rdquo; tap writes two database rows: one in <code>ai_prompts</code> (what we asked) and one in <code>ai_responses</code> (what Claude said). Open <code>sqlite3</code> on the Pi and have a look:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>terminal &middot; on the Pi</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>sqlite3 data/sqlite/platform.db &lt;&lt;'SQL'
+.headers on
+.mode column
+.width 12 18 60
+
+SELECT id, template_id, substr(rendered_text, 1, 60) AS rendered
+FROM ai_prompts
+ORDER BY created_at DESC
+LIMIT 3;
+
+SELECT substr(prompt_id, 1, 8) AS prompt,
+       provider,
+       model,
+       input_tokens, output_tokens, latency_ms,
+       status
+FROM ai_responses
+ORDER BY created_at DESC
+LIMIT 3;
+SQL</code></pre>
+            </div>
+
+            <p>You&rsquo;ll see the actual prompt that went to Claude (with your sensor&rsquo;s values plugged in) and the metadata about each call. This is gold for debugging: if a response looks weird, you can read the exact prompt that produced it.</p>
+
+            <div class="callout info">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">Where the system prompt lives</div>
+                <p>Only the user prompt is stored as <code>rendered_text</code>. The system prompt (the &ldquo;You are a friendly science teacher…&rdquo; part) is identical for every call &mdash; it&rsquo;s fixed by the template at boot. Look at <code>services/ai/app/prompts/explain-sensor-v1.md</code> to see it.</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-5">
+                <span class="check-text">I&rsquo;ve seen at least one row in <code>ai_prompts</code> and one in <code>ai_responses</code>.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 6: usage ============================================= -->
+
+        <section id="step-6" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">6</div>
+            <div class="step-title-block">
+              <h3>Watch token usage</h3>
+              <div class="step-meta"><span>~5 minutes</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>Claude charges per <strong>token</strong> (roughly: a word or a piece of one). The Settings page shows a rolling 7-day total so you can keep an eye on cost.</p>
+
+            <p>Go to <strong>Settings</strong> in the sidebar. The new <em>AI usage</em> section shows four cards: <strong>Calls</strong>, <strong>Successes</strong>, <strong>Input tokens</strong>, <strong>Output tokens</strong>. Tap a few sensor cards and tap &ldquo;Explain&rdquo; a few times, then refresh the Settings page (with the page reload icon, or by re-entering Settings). The numbers should grow.</p>
+
+            <p>You can also pull the same data straight from the API:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>terminal &middot; anywhere</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>curl -s "http://pi-iot-XX.local/api/ai/usage?days=7" | python3 -m json.tool</code></pre>
+            </div>
+
+            <div class="callout info">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">Rough numbers for Haiku 4.5</div>
+                <p>Each Explain call costs ~180 input tokens and ~40 output tokens. At the time of writing, Haiku is ~£1 per million input tokens and ~£4 per million output tokens. So 1000 explain calls ≈ £0.34. Pocket money for a whole school term.</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-6">
+                <span class="check-text">Settings shows the four usage cards; the numbers grow as I tap &ldquo;Explain&rdquo;.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 7: final ============================================== -->
+
+        <section id="step-7" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">7</div>
+            <div class="step-title-block">
+              <h3>Final verification</h3>
+              <div class="step-meta"><span>5 minutes</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>Tick everything below before declaring Phase&nbsp;6 done.</p>
+
+            <div class="final-checklist">
+              <h3>Phase 6 sign-off</h3>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-1">
+                  <span class="check-text">AI service started successfully and loaded <code>explain-sensor-v1</code>.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-2">
+                  <span class="check-text">Tapping a sensor card opens the modal with an &ldquo;Explain this reading&rdquo; button.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-3">
+                  <span class="check-text">Stub mode (no API key) returns a canned message and shows the OFFLINE tag.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-4">
+                  <span class="check-text">With a valid <code>ANTHROPIC_API_KEY</code>, the same button returns a proper Year-7 explanation in &lt;&nbsp;4&nbsp;seconds.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-5">
+                  <span class="check-text">Each call writes one row to <code>ai_prompts</code> and one to <code>ai_responses</code>.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-6">
+                  <span class="check-text">Settings &gt; AI usage updates as you tap &ldquo;Explain&rdquo;.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-7">
+                  <span class="check-text">Restarting the API service does not break the Explain flow.</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- NEXT ====================================================== -->
+
+        <section id="next" class="next-up">
+          <h3>Phase 6 complete?</h3>
+          <p>You&rsquo;ve put a real Large Language Model in the loop &mdash; structured, tracked, and reasonably cheap. Last phase: tie it all together with hardware. Real Micro:bit, real ESP32, real classroom sensors.</p>
+          <a href="index.html" class="btn disabled" data-require-all-checked aria-disabled="true">Phase 7: Your first module &nbsp;&rarr;</a>
+          <p style="margin-top: 14px; color: var(--text-faint); font-size: 0.88rem;">
+            (The button unlocks when every box above is ticked.)
+          </p>
+        </section>
+
+      </article>
+
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <span>&copy; Coderra.je &middot; Designed for Haute Vall&eacute;e School</span>
+    <span>Phase 6 of 7 &middot; Pi IoT Academy</span>
+  </div>
+</footer>
+
+<script src="js/main.js" defer></script>
+</body>
+</html>
