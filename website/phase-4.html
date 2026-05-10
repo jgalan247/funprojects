@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 4 &middot; Save Your Data &mdash; Pi IoT Academy</title>
+<meta name="description" content="Phase 4 of the Pi IoT Academy: persist sensor readings to SQLite, browse the time series, prove durability across restarts, and meet the retention job.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="phase" data-phase="phase-4">
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="brand" aria-label="Pi IoT Academy home">
+      <span class="brand-logo" aria-hidden="true">Pi</span>
+      <span>
+        <span class="brand-name">Pi IoT Academy</span><br>
+        <span class="brand-sub">Phase 4 &middot; Save Your Data</span>
+      </span>
+    </a>
+    <nav class="topnav">
+      <a href="index.html">All phases</a>
+      <span class="progress-pill" data-progress-pill>0 / 0 done</span>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="container">
+      <p style="color: var(--text-faint); font-family: var(--font-mono); font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase; margin: 0 0 6px;">
+        Phase 04
+      </p>
+      <h1>Save your <span class="accent">data</span>.</h1>
+      <p class="lede">
+        In Phase&nbsp;3 your sensor data was magic &mdash; it appeared on the
+        screen and disappeared the moment the API restarted. Now you&rsquo;ll
+        teach the Pi to remember everything in a real database, and prove
+        that nothing is lost when you pull the plug.
+      </p>
+      <div class="hero-meta">
+        <span class="tag tag-time"><span class="dot"></span>~45&ndash;60 min</span>
+        <span class="tag tag-difficulty"><span class="dot"></span>Difficulty: 2 / 3</span>
+        <span class="tag"><span class="dot"></span>SQL is fun, actually</span>
+        <span class="tag"><span class="dot"></span>Software lesson</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <div class="phase-layout">
+
+      <aside class="toc" aria-label="Steps in this phase">
+        <p class="toc-title">In this phase</p>
+        <ol>
+          <li><a href="#concept">What durable means</a></li>
+          <li><a href="#step-1">1. Pull in the new code</a></li>
+          <li><a href="#step-2">2. Find your data</a></li>
+          <li><a href="#step-3">3. Inspect with sqlite3</a></li>
+          <li><a href="#step-4">4. Pump in fresh readings</a></li>
+          <li><a href="#step-5">5. Browse the time series</a></li>
+          <li><a href="#step-6">6. Prove durability</a></li>
+          <li><a href="#step-7">7. Meet the retention job</a></li>
+          <li><a href="#step-8">8. Final verification</a></li>
+          <li><a href="#next">What&rsquo;s next</a></li>
+        </ol>
+      </aside>
+
+      <article>
+
+        <!-- CONCEPT =================================================== -->
+
+        <section id="concept" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">0</div>
+            <div class="step-title-block">
+              <h3>What &ldquo;durable&rdquo; means</h3>
+              <div class="step-meta"><span>Read this first.</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>Until now, the API kept the latest reading per sensor in <strong>memory</strong> &mdash; in a Python dictionary. Memory is fast and easy, but the moment the program restarts (or the Pi loses power), every value is gone. That&rsquo;s called <strong>volatile</strong> storage.</p>
+
+            <p>For an IoT lab to be useful, we want <strong>durable</strong> storage: data survives restarts. We&rsquo;ll use <strong>SQLite</strong>, which is a database that lives in a single file on disk. No separate server, no extra service to install &mdash; just a file the API reads and writes.</p>
+
+            <div class="bom-grid">
+              <div class="bom-item">
+                <div class="bom-item-name">Why SQLite, not Postgres?</div>
+                <div class="bom-item-note">Postgres needs its own server, network port, and config. For one Pi with classroom-sized data, SQLite is plenty &mdash; and the platform is structured so we can swap it for Postgres later without rewriting business code.</div>
+              </div>
+              <div class="bom-item">
+                <div class="bom-item-name">What&rsquo;s a &ldquo;repository&rdquo;?</div>
+                <div class="bom-item-note">A small Python class with methods like <code>readings.append(...)</code> that hides the SQL. The rest of the app never writes raw SQL &mdash; that&rsquo;s the seam that makes the storage swappable.</div>
+              </div>
+              <div class="bom-item">
+                <div class="bom-item-name">What&rsquo;s a &ldquo;migration&rdquo;?</div>
+                <div class="bom-item-note">A script that creates or changes database tables. We use <strong>Alembic</strong>; the API runs <code>upgrade head</code> on startup, so the schema is always current.</div>
+              </div>
+            </div>
+
+            <p style="margin-top: 16px;">By the end of this phase, the API will:</p>
+            <ul>
+              <li>Save every sensor reading to <code>data/sqlite/platform.db</code>.</li>
+              <li>Auto-register devices and sensors on first sight (you don&rsquo;t configure anything).</li>
+              <li>Hydrate the in-memory cache from the database on startup so the dashboard isn&rsquo;t empty after a restart.</li>
+              <li>Run a nightly clean-up at 03:00 UTC that deletes readings older than 30 days.</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- STEP 1: pull new code ===================================== -->
+
+        <section id="step-1" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">1</div>
+            <div class="step-title-block">
+              <h3>Pull in the new code</h3>
+              <div class="step-meta"><span>~5 minutes &middot; on the Pi</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>Phase&nbsp;4 adds new files to the platform repo (the database layer, the retention job). On the Pi:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>terminal &middot; on the Pi</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>cd /opt/iot-platform
+git pull
+docker compose build api
+docker compose up -d</code></pre>
+            </div>
+
+            <p><code>docker compose build api</code> rebuilds the API image with the new Python dependencies (SQLAlchemy, Alembic, APScheduler). <code>up -d</code> restarts only what changed.</p>
+
+            <p>Watch the API logs:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>terminal &middot; on the Pi</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>docker compose logs -f api</code></pre>
+            </div>
+
+            <p>You should see lines like:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>expected</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>INFO  alembic.runtime.migration  Running upgrade  -&gt; 0001, initial schema
+INFO  iot.api  cache hydrated: 0 sensor(s)
+INFO  iot.api  retention scheduled at 03:00 UTC, 30-day window
+INFO  iot.mqtt  MQTT connected to mosquitto:1883</code></pre>
+            </div>
+
+            <p>The first line means Alembic created the database tables. <code>Ctrl+C</code> stops following the logs (the API keeps running).</p>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-1">
+                <span class="check-text">Logs show <code>Running upgrade -&gt; 0001</code> and the API connects to MQTT.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 2: find data ========================================= -->
+
+        <section id="step-2" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">2</div>
+            <div class="step-title-block">
+              <h3>Find your data on disk</h3>
+              <div class="step-meta"><span>~2 minutes</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>The database lives in a single file:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>terminal &middot; on the Pi</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>ls -lh data/sqlite/</code></pre>
+            </div>
+
+            <p>You should see <code>platform.db</code> and possibly <code>platform.db-wal</code> / <code>platform.db-shm</code> next to it. Those are SQLite&rsquo;s &ldquo;write-ahead log&rdquo; helper files &mdash; they let writers and readers work at the same time without blocking each other.</p>
+
+            <div class="callout info">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">Backups are easy</div>
+                <p>Because the entire database is one file, backing it up is as easy as <code>cp platform.db platform-backup.db</code>. To reset the lab, you can <code>rm platform.db</code> and restart the API &mdash; Alembic will recreate the tables on boot.</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-2">
+                <span class="check-text"><code>data/sqlite/platform.db</code> exists.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 3: sqlite3 =========================================== -->
+
+        <section id="step-3" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">3</div>
+            <div class="step-title-block">
+              <h3>Inspect with <code>sqlite3</code></h3>
+              <div class="step-meta"><span>~10 minutes</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>SQLite has its own command-line tool. Install it if you don&rsquo;t have it, then open the database:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>terminal &middot; on the Pi</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>sudo apt install -y sqlite3
+sqlite3 data/sqlite/platform.db</code></pre>
+            </div>
+
+            <p>You&rsquo;re now in the SQLite shell. Try these:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>sqlite&gt; prompt</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>.tables
+.schema sensor_readings
+SELECT COUNT(*) FROM sensor_readings;
+.exit</code></pre>
+            </div>
+
+            <p>Expected:</p>
+            <ul>
+              <li><code>.tables</code> lists the seven tables: <code>devices</code>, <code>sensors</code>, <code>sensor_readings</code>, <code>system_logs</code>, <code>modules</code>, <code>ai_prompts</code>, <code>ai_responses</code>. (The last three are reserved for later phases.)</li>
+              <li><code>.schema sensor_readings</code> prints the <code>CREATE TABLE</code> statement &mdash; this is what Alembic ran for you.</li>
+              <li><code>SELECT COUNT(*)</code> returns <code>0</code> if no readings have been published yet, or a number if Phase&nbsp;3 was running before you restarted.</li>
+            </ul>
+
+            <div class="callout info">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">SQLite shortcuts to know</div>
+                <ul style="margin: 0;">
+                  <li><code>.tables</code> &mdash; list tables.</li>
+                  <li><code>.schema [name]</code> &mdash; show the create statement.</li>
+                  <li><code>.headers on</code> + <code>.mode column</code> &mdash; pretty-print SELECTs.</li>
+                  <li><code>.exit</code> &mdash; quit.</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-3">
+                <span class="check-text">I&rsquo;ve listed the tables and seen the <code>sensor_readings</code> schema.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 4: pump in =========================================== -->
+
+        <section id="step-4" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">4</div>
+            <div class="step-title-block">
+              <h3>Pump in fresh readings</h3>
+              <div class="step-meta"><span>~5 minutes</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>Start the publisher from your laptop again (same command as Phase&nbsp;3):</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>terminal &middot; on your laptop</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>python3 scripts/publish-test-sensor.py \
+  --host pi-iot-XX.local \
+  --password "&lt;your MQTT password&gt;"</code></pre>
+            </div>
+
+            <p>Let it run for at least 30 seconds. You should see the dashboard light up as before. <em>Now</em>, on the Pi, peek at the database again:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>terminal &middot; on the Pi</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>sqlite3 data/sqlite/platform.db &lt;&lt;'SQL'
+.headers on
+.mode column
+SELECT COUNT(*) AS readings FROM sensor_readings;
+SELECT id, device_id, metric, unit FROM sensors;
+SELECT * FROM sensor_readings ORDER BY id DESC LIMIT 5;
+SQL</code></pre>
+            </div>
+
+            <p>You should see:</p>
+            <ul>
+              <li>A growing <code>readings</code> count &mdash; about 2 readings per second (one for temperature, one for humidity).</li>
+              <li>Two rows in <code>sensors</code>: one for temperature, one for humidity, both for <code>microbit-test-01</code>.</li>
+              <li>The five most recent readings with timestamps.</li>
+            </ul>
+
+            <div class="callout info">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">No setup, no migrations to write</div>
+                <p>You didn&rsquo;t register the sensor anywhere &mdash; the API noticed it on first sight and wrote a row to the <code>sensors</code> table. This is called <em>idempotent upsert</em>: insert if new, do nothing if it already exists.</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-4">
+                <span class="check-text"><code>SELECT COUNT(*) FROM sensor_readings</code> grows with every second of publishing.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 5: API ================================================ -->
+
+        <section id="step-5" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">5</div>
+            <div class="step-title-block">
+              <h3>Browse the time series via the API</h3>
+              <div class="step-meta"><span>~5 minutes</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>You don&rsquo;t need <code>sqlite3</code> to read the database. The API exposes the same data as JSON. From any machine on the LAN:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>terminal &middot; anywhere</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>curl -s http://pi-iot-XX.local/api/sensors | python3 -m json.tool</code></pre>
+            </div>
+
+            <p>This lists every sensor with its latest value. To get a small time series:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>terminal &middot; anywhere</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>curl -s "http://pi-iot-XX.local/api/sensors/microbit-test-01.temperature/readings?limit=10" \
+  | python3 -m json.tool</code></pre>
+            </div>
+
+            <p>You get the last ten readings, newest first. <code>limit</code> is capped at 1000 to stop a runaway query from filling memory.</p>
+
+            <div class="callout info">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">Pipe through <code>jq</code> for nicer formatting</div>
+                <p>If you have <code>jq</code> installed (<code>sudo apt install jq</code> on Linux, <code>brew install jq</code> on Mac), it does syntax highlighting and is much faster than <code>python3 -m json.tool</code>.</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-5">
+                <span class="check-text">Both <code>/api/sensors</code> and <code>/api/sensors/&hellip;/readings</code> return JSON with real values.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 6: durability ======================================== -->
+
+        <section id="step-6" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">6</div>
+            <div class="step-title-block">
+              <h3>Prove durability</h3>
+              <div class="step-meta"><span>~5 minutes &middot; the moment of truth</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>The point of all this is that the data <em>survives</em>. Let&rsquo;s force a restart and see what happens.</p>
+
+            <ol>
+              <li>Stop the publisher on your laptop (<code>Ctrl+C</code>).</li>
+              <li>On the Pi, restart just the API:
+                <div class="code-block" style="margin: 8px 0;">
+                  <div class="code-block-header"><span>terminal &middot; on the Pi</span><button class="copy-btn" type="button">Copy</button></div>
+                  <pre><code>docker compose restart api</code></pre>
+                </div>
+              </li>
+              <li>Watch the dashboard. Within a few seconds, the connection pill goes back to <code>connected</code>, and your two cards reappear &mdash; with their last values from before the restart, and a <strong>STALE</strong> badge.</li>
+            </ol>
+
+            <p>That&rsquo;s the database working. The API booted up, ran <code>SELECT</code> against the <code>sensors</code> and <code>sensor_readings</code> tables, populated the in-memory cache, and the dashboard saw the snapshot the moment it reconnected.</p>
+
+            <p>For an even stronger demo, reboot the whole Pi:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>terminal &middot; on the Pi</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>sudo reboot</code></pre>
+            </div>
+
+            <p>Wait for it to come back up (~1 minute). SSH back in, check <code>docker compose ps</code> &mdash; everything should be <code>Up</code>. Open the dashboard &mdash; the cards are still there.</p>
+
+            <div class="callout warn">
+              <div class="callout-icon" aria-hidden="true">!</div>
+              <div class="callout-body">
+                <div class="callout-title">If the cards don&rsquo;t come back</div>
+                <p>Three places to look. <code>docker compose logs api</code> &mdash; did the API hydrate? <code>sqlite3 data/sqlite/platform.db "SELECT COUNT(*) FROM sensor_readings;"</code> &mdash; is the data actually there? Browser dev tools &mdash; is the WebSocket connecting?</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-6">
+                <span class="check-text">After restarting the API, the dashboard shows the previous readings with STALE badges.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 7: retention ========================================= -->
+
+        <section id="step-7" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">7</div>
+            <div class="step-title-block">
+              <h3>Meet the retention job</h3>
+              <div class="step-meta"><span>~5 minutes</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>Storage isn&rsquo;t free. If the publisher runs for a year at 1 reading per second, that&rsquo;s 31 million rows for one sensor. Most of that history isn&rsquo;t interesting after a month.</p>
+
+            <p>The API has a built-in scheduler. Every day at <strong>03:00 UTC</strong>, it deletes <code>sensor_readings</code> rows older than 30 days and writes an audit row to <code>system_logs</code>. The retention window is configurable via the <code>READINGS_RETENTION_DAYS</code> environment variable.</p>
+
+            <p>You can browse the audit log via the API:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>terminal &middot; anywhere</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>curl -s "http://pi-iot-XX.local/api/system/logs?limit=10" | python3 -m json.tool</code></pre>
+            </div>
+
+            <p>You should see a <code>boot</code> event from when the API last started. After 03:00 tomorrow, you&rsquo;ll see a <code>reading_retention.run</code> event with how many rows it deleted.</p>
+
+            <div class="callout info">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">Why structured logs</div>
+                <p>Lines of text are fine for humans. <code>system_logs</code> rows are <em>structured</em> &mdash; the <code>detail_json</code> column has machine-readable fields. The dashboard can read them, alerts can trigger off them, and you can ask questions like &ldquo;how many readings did retention delete this month?&rdquo; with a single SQL query.</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-7">
+                <span class="check-text"><code>/api/system/logs</code> returns JSON with at least one <code>boot</code> event.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 8: final ============================================== -->
+
+        <section id="step-8" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">8</div>
+            <div class="step-title-block">
+              <h3>Final verification</h3>
+              <div class="step-meta"><span>5 minutes</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>Tick everything below before declaring Phase 4 done.</p>
+
+            <div class="final-checklist">
+              <h3>Phase 4 sign-off</h3>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-1">
+                  <span class="check-text">Alembic ran on first boot and created seven tables in <code>data/sqlite/platform.db</code>.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-2">
+                  <span class="check-text">Running the publisher writes new rows to <code>sensor_readings</code>; <code>SELECT COUNT(*)</code> goes up steadily.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-3">
+                  <span class="check-text">A new sensor (different <code>--device</code>) automatically appears in the <code>sensors</code> table without any extra setup.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-4">
+                  <span class="check-text">Both <code>/api/sensors</code> and <code>/api/sensors/&hellip;/readings?limit=10</code> return correct JSON.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-5">
+                  <span class="check-text">After a Pi reboot, the dashboard shows the previous readings with STALE badges &mdash; data wasn&rsquo;t lost.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-6">
+                  <span class="check-text"><code>/api/system/logs</code> includes a <code>boot</code> event from the last API start.</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- NEXT ====================================================== -->
+
+        <section id="next" class="next-up">
+          <h3>Phase 4 complete?</h3>
+          <p>You&rsquo;ve got a real backend. Sensors register themselves, readings are durable, the time series is browsable, and the platform cleans up after itself. Next phase: build a touchscreen dashboard worthy of all this data.</p>
+          <a href="index.html" class="btn disabled" data-require-all-checked aria-disabled="true">Phase 5: Design the dashboard &nbsp;&rarr;</a>
+          <p style="margin-top: 14px; color: var(--text-faint); font-size: 0.88rem;">
+            (The button unlocks when every box above is ticked.)
+          </p>
+        </section>
+
+      </article>
+
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <span>&copy; Coderra.je &middot; Designed for Haute Vall&eacute;e School</span>
+    <span>Phase 4 of 7 &middot; Pi IoT Academy</span>
+  </div>
+</footer>
+
+<script src="js/main.js" defer></script>
+</body>
+</html>

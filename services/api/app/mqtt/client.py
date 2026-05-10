@@ -15,7 +15,7 @@ from typing import Awaitable, Callable
 import aiomqtt
 
 from app.mqtt.parser import ParseError, parse_envelope
-from app.state import LatestReadingsStore, Reading
+from app.state import Reading
 
 logger = logging.getLogger("iot.mqtt")
 
@@ -28,11 +28,14 @@ async def run_subscriber(
     port: int,
     user: str,
     password: str,
-    store: LatestReadingsStore,
     on_reading: OnReading,
     backoff_s: float = 5.0,
 ) -> None:
-    """Run forever (until cancelled). Reconnects on any MQTT error."""
+    """Run forever (until cancelled). Reconnects on any MQTT error.
+
+    Each parsed reading is handed to ``on_reading``. The subscriber itself is
+    storage-agnostic — persistence and broadcast live in the callback.
+    """
     while True:
         try:
             async with aiomqtt.Client(
@@ -55,7 +58,6 @@ async def run_subscriber(
                             "dropped bad message on %s: %s", message.topic, exc
                         )
                         continue
-                    store.put(reading)
                     await on_reading(reading)
         except aiomqtt.MqttError as exc:
             logger.warning(
