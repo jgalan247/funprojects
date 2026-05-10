@@ -3,10 +3,35 @@
 A modular, reusable, portable terminal for classroom IoT and AI demonstrations,
 built on a Raspberry Pi 4B with the official 5" touchscreen.
 
-This directory currently contains **planning and design documents only** — no
-code yet. Implementation begins once the hardware runbook in
-[`docs/hardware-runbook.md`](docs/hardware-runbook.md) has been completed and
-the architecture is approved.
+## Quick start (for adults)
+
+Students should follow the walkthrough on the [Pi IoT Academy
+website](website/index.html). For anyone who just wants the commands:
+
+```bash
+# On a fresh Pi with Raspberry Pi OS 64-bit:
+cd /opt/iot-platform
+git clone <this repo> .
+./scripts/bootstrap-pi.sh        # installs Docker, adds user to docker group
+# (log out + back in for the group change)
+
+cp .env.example .env
+nano .env                         # set MQTT_PASSWORD; ANTHROPIC_API_KEY can wait
+./scripts/bootstrap-mqtt-passwd.sh
+
+docker compose up -d
+docker compose ps
+```
+
+When all five containers report healthy:
+
+| URL                                | What |
+| ---                                | ---  |
+| `http://<pi>/`                     | Vue placeholder dashboard |
+| `http://<pi>:1880/`                | Node-RED |
+| `http://<pi>:8000/health`          | API health check |
+| `http://<pi>:8001/health`          | AI service health check |
+| `mqtt://<pi>:1883` (auth required) | Mosquitto MQTT broker |
 
 ## Goals
 
