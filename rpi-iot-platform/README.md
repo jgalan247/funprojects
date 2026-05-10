@@ -33,7 +33,7 @@ the architecture is approved.
 | [`docs/folder-layout.md`](docs/folder-layout.md) | Target repository folder structure for code, modules, and infrastructure. |
 | [`docs/mqtt-conventions.md`](docs/mqtt-conventions.md) | MQTT topic naming, payload schema, QoS, and retention rules. |
 | [`docs/database-design.md`](docs/database-design.md) | SQLite schema, repository abstraction, and migration path to Postgres / TimescaleDB / InfluxDB. |
-| [`docs/ai-integration.md`](docs/ai-integration.md) | Claude API integration, provider abstraction, prompt templating, and persistence. |
+| [`docs/ai-integration.md`](docs/ai-integration.md) | Claude Haiku integration: user-triggered "Explain" button, prompt template, and persistence. |
 | [`docs/implementation-plan.md`](docs/implementation-plan.md) | Phased delivery plan from hardware bring-up through to the first classroom module. |
 
 ## Status
@@ -45,7 +45,7 @@ the architecture is approved.
 | 3 | MQTT core | Planned |
 | 4 | Database core | Planned |
 | 5 | Dashboard core | Planned |
-| 6 | AI API integration (Claude) | Planned |
+| 6 | AI API integration (Claude Haiku, "Explain" button) | Planned |
 | 7 | First module — Classroom Sensor Hub | Planned |
 
 ## Working language

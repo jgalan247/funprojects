@@ -50,15 +50,13 @@ rpi-iot-platform/
 │   │   │   └── services/              # Application-layer services.
 │   │   └── tests/
 │   │
-│   ├── ai/                            # AI service: Claude SDK + provider abstraction.
+│   ├── ai/                            # AI service: thin Claude wrapper.
 │   │   ├── pyproject.toml
 │   │   ├── app/
-│   │   │   ├── main.py                # FastAPI app exposing /ai/* and an MQTT bridge.
-│   │   │   ├── providers/
-│   │   │   │   ├── base.py            # Provider interface.
-│   │   │   │   ├── claude.py          # Anthropic SDK implementation.
-│   │   │   │   └── echo.py            # Test/offline provider.
-│   │   │   ├── prompts/               # Versioned prompt templates.
+│   │   │   ├── main.py                # FastAPI app exposing POST /ai/explain.
+│   │   │   ├── claude.py              # anthropic SDK call + retries.
+│   │   │   ├── prompts/
+│   │   │   │   └── explain-sensor-v1.md
 │   │   │   └── persistence.py         # Writes ai_prompts / ai_responses.
 │   │   └── tests/
 │   │

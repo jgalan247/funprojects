@@ -21,7 +21,6 @@ service in real time goes through it. This document is binding for v1.
 | `weather/` | Weather station module. |
 | `greenhouse/` | Greenhouse / soil module. |
 | `bike/` | Bike dashboard module. |
-| `ai/` | AI requests and responses. |
 | `system/` | Platform health, status, audit. |
 | `module/` | Module lifecycle (registered, started, stopped). |
 | `dev/` | Development / scratch — never read by production code. |
@@ -37,8 +36,6 @@ A new domain requires updating this table and the
 | `classroom/sensor/microbit-01/humidity`    | sensor → broker | |
 | `greenhouse/soil/probe-a/moisture`         | sensor → broker | |
 | `weather/station/main/pressure`            | sensor → broker | |
-| `ai/request`                               | service → broker | One topic; payload carries the source. |
-| `ai/response/<correlation-id>`             | broker → caller | Replies are correlation-scoped. |
 | `system/status/api`                        | service → broker | Heartbeat. |
 | `system/status/mosquitto`                  | broker → broker | Mosquitto's own `$SYS` is separate. |
 | `module/lifecycle/sensor-hub`              | service → broker | Module up/down. |
@@ -84,47 +81,9 @@ Every payload includes:
   `metres-per-second`, `lux`, `ppm`. No symbols (`°C`, `%`).
 - `quality` is one of `good`, `stale`, `suspect`, `error`. Defaults to `good`.
 
-### 2.2 AI request shape
-
-Topic: `ai/request`
-
-```json
-{
-  "ts": "2026-05-10T13:45:12.123Z",
-  "source": "frontend",
-  "schema": "v1",
-  "data": {
-    "correlation_id": "01J...ULID",
-    "template": "explain-sensors-v1",
-    "context": {
-      "readings": [
-        {"source": "microbit-01", "metric": "temperature", "value": 24.3, "unit": "celsius"},
-        {"source": "microbit-01", "metric": "humidity",    "value": 70,   "unit": "percent"}
-      ],
-      "audience": "year-7"
-    }
-  }
-}
-```
-
-### 2.3 AI response shape
-
-Topic: `ai/response/<correlation_id>`
-
-```json
-{
-  "ts": "2026-05-10T13:45:12.987Z",
-  "source": "ai-service",
-  "schema": "v1",
-  "data": {
-    "correlation_id": "01J...ULID",
-    "provider": "claude",
-    "model": "claude-opus-4-7",
-    "text": "The soil moisture is low ...",
-    "tokens": {"input": 412, "output": 87}
-  }
-}
-```
+> **AI is not on the bus.** The "Explain" feature is user-triggered and goes
+> over HTTP only (see [`ai-integration.md`](ai-integration.md)). MQTT carries
+> sensor data and platform status — nothing else.
 
 ## 3. QoS and retention
 
@@ -133,8 +92,6 @@ Topic: `ai/response/<correlation_id>`
 | High-frequency sensor readings | 0 | No |
 | Critical alerts (e.g. `system/alert/*`) | 1 | No |
 | Last-known status (`system/status/*`, `module/lifecycle/*`) | 1 | **Yes** |
-| AI request | 1 | No |
-| AI response | 1 | No |
 
 Rule of thumb: **retained = "the latest value belongs on the dashboard the
 moment it loads"**. Anything ephemeral or high-volume is not retained.
@@ -151,7 +108,6 @@ Common subscriber patterns:
 | `classroom/sensor/+/+` | Sensor hub backend, Vue dashboard. |
 | `+/sensor/+/+` | Cross-module sensor view. |
 | `system/#` | Admin / Node-RED debug flows. |
-| `ai/response/+` | Whoever issued the matching `ai/request`. |
 
 ## 5. Authentication and ACLs
 

@@ -23,40 +23,42 @@ multiple educational modules — all on the same software platform.
 ## 3. Logical architecture
 
 ```
-+---------------------+        +-----------------+
-|  Sensors / devices  |        |  Cloud AI APIs  |
-|  (Micro:bit, ESP32, |        |  (Anthropic,    |
-|   USB sensors, ...) |        |   OpenAI, etc.) |
-+----------+----------+        +--------+--------+
-           |                            ^
-           | MQTT publish               | HTTPS
-           v                            |
-+----------+--------------------------------------+
-|                  Mosquitto (MQTT)                |
-+----+---------------------+-----------------------+
-     |                     |                     ^
-     | subscribe           | subscribe           | publish (ai/response)
-     v                     v                     |
-+----+--------+      +-----+--------+      +-----+--------+
-|  Node-RED   |      |  FastAPI     |      |  AI service  |
-|  (automation|      |  (REST API,  |<---->|  (Claude SDK,|
-|   admin UI, |      |   WebSockets)|      |   prompt log)|
-|   prototypes)      +-----+--------+      +--------------+
-+-------------+            |
-                           v
-                    +------+-------+
-                    |   SQLite     |
-                    | (sensors,    |
-                    |  ai_prompts, |
-                    |  logs, ...)  |
-                    +------+-------+
-                           |
-                           v
-                  +--------+---------+
-                  |   Vue + Tailwind |
-                  | (touchscreen UI, |
-                  |  module launcher)|
-                  +------------------+
++---------------------+
+|  Sensors / devices  |
+|  (Micro:bit, ESP32, |
+|   USB sensors, ...) |
++----------+----------+
+           |
+           | MQTT publish
+           v
++----------+----------------+
+|     Mosquitto (MQTT)      |
++----+-----------------+----+
+     |                 |
+     | subscribe       | subscribe
+     v                 v
++----+--------+    +---+----------+        +-------------------+
+|  Node-RED   |    |   FastAPI    |        |   Anthropic API   |
+|  (automation|    |  (REST + WS) |        |    (Claude        |
+|   admin UI, |    |              |        |     Haiku 4.5)    |
+|   debug)    |    +---+----------+        +---------+---------+
++-------------+        |       \                     ^
+                       |        \                    | HTTPS
+                       v         \                   | (user-triggered)
+                +------+-----+    \                  |
+                |   SQLite   |     \      +----------+----------+
+                | sensors,   |      ----->|     AI service      |
+                | ai_prompts,|<-----------|  (Claude SDK,       |
+                | logs, ...  |  persist   |   prompt log)       |
+                +------+-----+            +---------------------+
+                       |
+                       v
+              +--------+---------+
+              |  Vue + Tailwind  |
+              | (touchscreen UI, |
+              |  module launcher,|
+              |  "Explain" btn)  |
+              +------------------+
 ```
 
 ## 4. Component responsibilities
@@ -66,7 +68,7 @@ multiple educational modules — all on the same software platform.
 | **Mosquitto** | Single MQTT broker, central pub/sub bus. | Persistence, business logic. |
 | **Node-RED** | Automation flows, MQTT debugging, admin tooling, rapid prototyping. | The primary user-facing UI. |
 | **FastAPI** | REST + WebSocket API for the Vue frontend; orchestrates DB, AI, and MQTT bridge. | Real-time sensor ingestion (that's MQTT). |
-| **AI service** | Calls cloud LLMs (Claude first), templates prompts, persists prompt/response pairs, exposes `ai/request` / `ai/response` MQTT topics and a REST endpoint. | Local inference. |
+| **AI service** | Calls Claude Haiku via the `anthropic` SDK, renders the prompt template, persists prompt/response pairs, exposes a single `/ai/explain` REST endpoint. | Local inference. MQTT triggers. Multi-provider support. |
 | **SQLite** | Durable storage for sensors, readings, devices, AI history, logs, modules registry. | High-frequency time-series (deferred to InfluxDB/Timescale if needed). |
 | **Vue + Tailwind** | Touchscreen dashboard, module launcher, settings, AI explainer surfaces. | Automation flows (those live in Node-RED). |
 | **Docker Compose** | Service orchestration, single-command bring-up, version pinning. | Multi-host orchestration (no k8s, no swarm). |
@@ -108,19 +110,28 @@ the reasoning so future contributors don't relitigate them.
 - **Consequences:** Every new module becomes "publish to this topic, subscribe
   to that topic" — a pattern students can learn and reuse.
 
-### ADR-003: Cloud AI APIs over local inference; Claude is the reference
+### ADR-003: Anthropic Claude only, Haiku as default model, user-triggered
 
 - **Status:** Accepted.
-- **Context:** Local LLM inference on a Pi 4B 8GB is slow and quality is poor
-  for the explanation use cases listed.
-- **Decision:** Use cloud AI APIs only. Anthropic Claude is the reference
-  implementation; the AI service exposes a provider interface so OpenAI /
-  Gemini / others can be added later without changing call sites.
+- **Context:** Local LLM inference on a Pi 4B 8GB is slow and low quality.
+  We need short, friendly explanations of single sensor readings, on demand,
+  when a student or teacher taps a button.
+- **Decision:**
+  - Cloud AI only. **Anthropic Claude only**, no provider abstraction.
+  - Default model: **Claude Haiku 4.5** (`claude-haiku-4-5-20251001`).
+    Cheap, fast, sufficient. Model ID lives in env, not code.
+  - **User-triggered only.** The single trigger is the "Explain" button on
+    a sensor card. No MQTT-driven AI flow, no automatic explanations.
 - **Alternatives considered:**
-  - Ollama on-device — too slow, too low quality for classroom use.
-  - Cloud-only with no abstraction — locks the platform to one vendor.
-- **Consequences:** API keys are required and must be stored in environment
-  variables, never in source control. See
+  - Ollama on-device — too slow and too poor for this use case.
+  - Multi-provider abstraction — hedges against a future we don't want; pure
+    overhead for v1.
+  - Opus / Sonnet defaults — overkill and ~15× the per-token cost vs Haiku
+    for no audible improvement on 2–3 sentence explanations.
+  - MQTT-triggered AI calls — adds complexity for no current use case.
+- **Consequences:** The API key sits in env vars on the AI service only. If
+  the key is missing, a deterministic stub takes over and the UI shows a
+  banner — the platform never crashes from a missing key. See
   [`ai-integration.md`](ai-integration.md).
 
 ### ADR-004: Vue + Tailwind is the primary UI; Node-RED is automation/admin
