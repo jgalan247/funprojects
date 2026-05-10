@@ -126,35 +126,37 @@ Tasks:
 - All four pages render and all controls are reachable by touch.
 - A class of 25 can stand 1.5 m away and read the active sensor card.
 
-## Phase 6 — AI integration (Claude)
+## Phase 6 — AI integration (Claude Haiku)
 
 | | |
 | --- | --- |
-| **Goal** | The "Explain this" button works, costs are tracked, history is browsable. |
-| **Effort** | 2–3 half-days. |
+| **Goal** | The "Explain" button on a sensor card calls Claude Haiku, shows a 2–3 sentence answer, and logs the prompt/response. |
+| **Effort** | 1–2 half-days. |
 | **Design doc** | [`ai-integration.md`](ai-integration.md). |
 
 Tasks:
 
-1. Implement `providers/claude.py` using the `anthropic` SDK. Enable prompt
-   caching on the system block.
-2. Implement the `Provider` interface, the registry, and the retry helper.
-3. Templates: `explain-sensors-v1.md`, `summarise-trend-v1.md`.
-4. REST endpoint `/api/ai/explain` and MQTT `ai/request` subscriber both
-   route through the same internal call.
-5. `AiExplainer.vue` component on each sensor card: tap → 2-sentence
-   explanation, with a "show prompt" debug toggle for teachers.
-6. Persistence: prompts and responses written every call.
-7. Cost view in `/settings`: weekly token usage, simple line chart.
+1. Add `services/ai/` with FastAPI, the `anthropic` SDK, a tiny retry helper,
+   and prompt caching on the system block.
+2. One template: `prompts/explain-sensor-v1.md`. Validate at boot.
+3. REST endpoint `POST /ai/explain` on the AI service.
+4. Thin proxy `POST /api/ai/explain` on the main API: looks up the latest
+   reading for the given `sensor_id` and forwards to the AI service.
+5. `AiExplainer.vue` on each sensor card: tap → call → render the text.
+6. Persistence: write `ai_prompts` and `ai_responses` on every call,
+   success or failure.
+7. Cost view in `/settings`: weekly tally of input/output tokens.
 
 **Exit criteria:**
 
 - Tapping "Explain" on a sensor card returns a sensible Year 7 explanation
-  in < 4 seconds at the 95th percentile.
-- The API key being absent makes the platform fall back to the `echo`
-  provider with a visible UI banner — no crashes.
+  in under 4 s at the 95th percentile.
+- With `ANTHROPIC_API_KEY` unset, the platform falls back to the deterministic
+  stub and the UI shows a banner — no crashes.
 - Every call appears in `ai_prompts` / `ai_responses` and is visible in the
   cost view.
+- Tapping "Explain" on a sensor with no readings yet is blocked at the API
+  boundary (409) and the UI button is disabled until a reading arrives.
 
 ## Phase 7 — First module: Classroom Sensor Hub
 
@@ -193,7 +195,7 @@ Tasks:
 | Anthropic API outage in a live lesson | Low | "Explain" stops working | `echo` provider fallback + visible UI banner; lessons don't depend on AI as the critical path. |
 | Wi-Fi unreliable in the classroom | Medium | No MQTT from Micro:bits | Pi can run a local Wi-Fi hotspot mode (Phase 5 stretch), Micro:bits join the Pi directly. |
 | Scope creep (more modules, more features) | High | v1 never ships | Each module is post-Phase-7. No new ADRs without explicit review. |
-| Vendor lock-in on Claude | Low | Cost / availability | Provider abstraction (Phase 6) means swapping vendors is a config change. |
+| Vendor lock-in on Claude | Low | Cost / availability | Acceptable for v1; AI is a single, isolated service so swapping vendors later is a contained change. |
 
 ## Out of scope for v1
 
