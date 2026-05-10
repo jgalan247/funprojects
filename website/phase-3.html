@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 3 &middot; Talk over MQTT &mdash; Pi IoT Academy</title>
+<meta name="description" content="Phase 3 of the Pi IoT Academy: send your first sensor reading from a laptop into the Pi over MQTT and watch it appear on the touchscreen in real time.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="phase" data-phase="phase-3">
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="brand" aria-label="Pi IoT Academy home">
+      <span class="brand-logo" aria-hidden="true">Pi</span>
+      <span>
+        <span class="brand-name">Pi IoT Academy</span><br>
+        <span class="brand-sub">Phase 3 &middot; Talk over MQTT</span>
+      </span>
+    </a>
+    <nav class="topnav">
+      <a href="index.html">All phases</a>
+      <span class="progress-pill" data-progress-pill>0 / 0 done</span>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="container">
+      <p style="color: var(--text-faint); font-family: var(--font-mono); font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase; margin: 0 0 6px;">
+        Phase 03
+      </p>
+      <h1>Talk over <span class="accent">MQTT</span>.</h1>
+      <p class="lede">
+        In Phase&nbsp;2 you proved the bus works by piping a single message
+        through. Now you&rsquo;ll wire it up properly: a fake sensor on your
+        laptop publishes a temperature reading every second, the API picks
+        it up, and the Pi&rsquo;s screen shows a live card that updates in
+        real time.
+      </p>
+      <div class="hero-meta">
+        <span class="tag tag-time"><span class="dot"></span>~45&ndash;60 min</span>
+        <span class="tag tag-difficulty"><span class="dot"></span>Difficulty: 2 / 3</span>
+        <span class="tag"><span class="dot"></span>One laptop is enough</span>
+        <span class="tag"><span class="dot"></span>Software lesson</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <div class="phase-layout">
+
+      <aside class="toc" aria-label="Steps in this phase">
+        <p class="toc-title">In this phase</p>
+        <ol>
+          <li><a href="#concept">How sensor data flows</a></li>
+          <li><a href="#step-1">1. Open the dashboard</a></li>
+          <li><a href="#step-2">2. Look at a real message</a></li>
+          <li><a href="#step-3">3. Run the test publisher</a></li>
+          <li><a href="#step-4">4. Watch the cards update</a></li>
+          <li><a href="#step-5">5. Peek at MQTT in Node-RED</a></li>
+          <li><a href="#step-6">6. Stop &amp; go stale</a></li>
+          <li><a href="#step-7">7. Final verification</a></li>
+          <li><a href="#next">What&rsquo;s next</a></li>
+        </ol>
+      </aside>
+
+      <article>
+
+        <!-- CONCEPT =================================================== -->
+
+        <section id="concept" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">0</div>
+            <div class="step-title-block">
+              <h3>How sensor data flows</h3>
+              <div class="step-meta"><span>Read this first.</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>Here is the path a single temperature reading will take:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>data flow</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>laptop  ─[publish]─→  Mosquitto  ─[subscribe]─→  API  ─[WebSocket]─→  dashboard
+sensor                broker                    (Pi)                  (browser)</code></pre>
+            </div>
+
+            <p>Three jobs. Each one is small, each one is useful on its own:</p>
+
+            <div class="bom-grid">
+              <div class="bom-item">
+                <div class="bom-item-name">1. Publisher</div>
+                <div class="bom-item-note">Anything that produces data and sends it. Your laptop today, a Micro:bit next week.</div>
+              </div>
+              <div class="bom-item">
+                <div class="bom-item-name">2. Broker</div>
+                <div class="bom-item-note">Mosquitto on the Pi. It doesn&rsquo;t store data &mdash; it just routes messages from publishers to subscribers.</div>
+              </div>
+              <div class="bom-item">
+                <div class="bom-item-name">3. Subscriber(s)</div>
+                <div class="bom-item-note">The API listens; whenever a message arrives it pushes it to every browser viewing the dashboard.</div>
+              </div>
+            </div>
+
+            <div class="callout info" style="margin-top: 18px;">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">Why this is clever</div>
+                <p>The publisher doesn&rsquo;t know who&rsquo;s listening. The dashboard doesn&rsquo;t know which Micro:bit sent the data. Both only know the broker. That&rsquo;s called <em>decoupling</em> &mdash; you can add a second sensor, or a third dashboard, without changing any of the others.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 1: Dashboard ========================================= -->
+
+        <section id="step-1" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">1</div>
+            <div class="step-title-block">
+              <h3>Open the dashboard</h3>
+              <div class="step-meta"><span>~2 minutes</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>From your laptop, open the dashboard:</p>
+            <div class="code-block">
+              <div class="code-block-header"><span>browser</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>http://pi-iot-XX.local/</code></pre>
+            </div>
+
+            <p>It should say <strong>&ldquo;No sensor data yet.&rdquo;</strong> with a connection pill in the top-right that reads <code>connected</code>. That&rsquo;s the dashboard reporting that it has an open WebSocket to the API. It just hasn&rsquo;t seen any sensor messages yet &mdash; because nothing is publishing.</p>
+
+            <div class="callout warn">
+              <div class="callout-icon" aria-hidden="true">!</div>
+              <div class="callout-body">
+                <div class="callout-title">If the pill says <code>disconnected</code></div>
+                <p>The API isn&rsquo;t reachable. SSH into the Pi and run <code>docker compose ps</code> &mdash; the <code>api</code> service should be <code>Up</code>. If not, check the logs: <code>docker compose logs api</code>.</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-1">
+                <span class="check-text">Dashboard loads and shows <code>connected</code>.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 2: A real message ===================================== -->
+
+        <section id="step-2" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">2</div>
+            <div class="step-title-block">
+              <h3>Look at a real message</h3>
+              <div class="step-meta"><span>~5 minutes</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>Before we send any messages, here&rsquo;s the shape they&rsquo;ll all use. Every reading published to the platform looks like this:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>topic</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>classroom/sensor/microbit-test-01/temperature</code></pre>
+            </div>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>payload (JSON)</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>{
+  "ts": "2026-05-10T13:45:12.123Z",
+  "source": "microbit-test-01",
+  "schema": "v1",
+  "data": {
+    "value": 24.3,
+    "unit": "celsius",
+    "quality": "good"
+  }
+}</code></pre>
+            </div>
+
+            <p>The topic is structured: <code>&lt;domain&gt;/sensor/&lt;device&gt;/&lt;measurement&gt;</code>. Every part is lowercase, every part is meaningful. The API subscribes to <code>+/sensor/+/+</code>, where <code>+</code> means &ldquo;match any one segment&rdquo; &mdash; so it picks up <em>every</em> sensor on every domain.</p>
+
+            <div class="callout info">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">Why JSON, why <code>schema: "v1"</code>?</div>
+                <p>JSON is human-readable and trivially decoded everywhere. The <code>schema</code> field is a promise: &ldquo;this message has the v1 shape&rdquo;. When we change the shape later we&rsquo;ll bump it to <code>v2</code>, and the API will be able to handle both.</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-2">
+                <span class="check-text">I can describe what each field of the payload is for.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 3: Run publisher ====================================== -->
+
+        <section id="step-3" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">3</div>
+            <div class="step-title-block">
+              <h3>Run the test publisher</h3>
+              <div class="step-meta"><span>~10 minutes &middot; on your laptop</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>The platform repo includes a small Python script that publishes fake temperature and humidity readings once a second. We&rsquo;ll run it on your laptop &mdash; it talks to the Pi over Wi-Fi.</p>
+
+            <p>If you don&rsquo;t already have the repo on your laptop, clone it. Then in a terminal:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>terminal &middot; on your laptop</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>cd /path/to/iot-platform
+pip install aiomqtt</code></pre>
+            </div>
+
+            <div class="callout info">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">Use a virtual environment</div>
+                <p>If <code>pip install</code> complains about &ldquo;externally-managed-environment&rdquo;, your system Python is locked. Create an isolated one:</p>
+<pre style="margin: 8px 0 0; font-family: var(--font-mono); font-size: 0.85em; color: var(--text);">python3 -m venv .venv
+source .venv/bin/activate
+pip install aiomqtt</pre>
+              </div>
+            </div>
+
+            <p>Now run the publisher, pointing it at your Pi:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>terminal &middot; on your laptop</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>python3 scripts/publish-test-sensor.py \
+  --host pi-iot-XX.local \
+  --password "&lt;your MQTT password&gt;"</code></pre>
+            </div>
+
+            <p>You should see lines tick by:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>expected output</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>→ connecting to pi-iot-XX.local:1883 as platform
+→ publishing as microbit-test-01 on classroom/sensor/microbit-test-01/{temperature,humidity}
+✓ connected. Publishing 1 Hz. Ctrl-C to stop.
+  t=   0.0s  temperature= 22.05 °C  humidity= 60.4 %
+  t=   1.0s  temperature= 22.18 °C  humidity= 60.5 %
+  t=   2.0s  temperature= 21.93 °C  humidity= 60.6 %</code></pre>
+            </div>
+
+            <p><strong>Leave it running.</strong> Don&rsquo;t close the terminal yet. We&rsquo;ll come back to it.</p>
+
+            <div class="callout warn">
+              <div class="callout-icon" aria-hidden="true">!</div>
+              <div class="callout-body">
+                <div class="callout-title">&ldquo;Connection refused&rdquo; or &ldquo;not authorised&rdquo;?</div>
+                <p>Same fixes as Phase 2: check the password matches <code>.env</code> on the Pi, and that your laptop is on the same Wi-Fi.</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-3">
+                <span class="check-text">The publisher is running and printing one new reading per second.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 4: Watch ============================================== -->
+
+        <section id="step-4" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">4</div>
+            <div class="step-title-block">
+              <h3>Watch the cards update</h3>
+              <div class="step-meta"><span>~5 minutes &middot; the fun bit</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>Switch back to the dashboard tab. Within one second of starting the publisher, you should see two cards appear:</p>
+
+            <ul>
+              <li><strong>microbit-test-01 / temperature</strong> with a value like <code>22.1 °C</code>.</li>
+              <li><strong>microbit-test-01 / humidity</strong> with a value like <code>60.4 %</code>.</li>
+            </ul>
+
+            <p>Each card&rsquo;s number should change every second &mdash; the value goes up and down a bit because the publisher&rsquo;s fake signal is a slow sine wave plus noise. Below the value you&rsquo;ll see &ldquo;just now&rdquo; or &ldquo;1 s ago&rdquo;, ticking up.</p>
+
+            <p>Try this:</p>
+
+            <ol>
+              <li><strong>Open a second tab</strong> on the same dashboard URL. The same cards appear instantly. Both tabs are subscribed to the same WebSocket; both get the same updates.</li>
+              <li><strong>Run a second publisher</strong> in another terminal with a different device name:
+              <div class="code-block" style="margin: 8px 0 0;">
+                <div class="code-block-header"><span>terminal 2 &middot; laptop</span><button class="copy-btn" type="button">Copy</button></div>
+                <pre><code>python3 scripts/publish-test-sensor.py \
+  --host pi-iot-XX.local \
+  --password "&lt;your MQTT password&gt;" \
+  --device microbit-test-02</code></pre>
+              </div>
+              <p>Two more cards appear. The dashboard didn&rsquo;t need to be told &mdash; it just received new sensor IDs from the API.</p>
+              </li>
+            </ol>
+
+            <div class="callout info">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">What you just demonstrated</div>
+                <p>The platform doesn&rsquo;t hard-code which sensors exist. New ones appear when they show up. Old ones stick around showing their last value. This is how every IoT system you&rsquo;ll ever build should behave.</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-4">
+                <span class="check-text">At least two sensor cards appear and update once a second.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 5: Node-RED =========================================== -->
+
+        <section id="step-5" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">5</div>
+            <div class="step-title-block">
+              <h3>Peek at MQTT in Node-RED</h3>
+              <div class="step-meta"><span>~10 minutes</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>Node-RED is your X-ray machine for the bus. Let&rsquo;s use it to see every message flying through the broker, in real time.</p>
+
+            <p>Open Node-RED:</p>
+            <div class="code-block">
+              <div class="code-block-header"><span>browser</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>http://pi-iot-XX.local:1880/</code></pre>
+            </div>
+
+            <p>Build a tiny three-node flow:</p>
+
+            <ol>
+              <li>From the left sidebar, drag an <strong>mqtt in</strong> node onto the canvas.</li>
+              <li>Drag a <strong>debug</strong> node next to it.</li>
+              <li>Connect the output of the mqtt node to the input of the debug node (click and drag from the right edge of one to the left edge of the other).</li>
+              <li>Double-click the mqtt node:
+                <ul>
+                  <li><strong>Server:</strong> click the pencil and add a new server.
+                    <ul>
+                      <li><strong>Server:</strong> <code>mosquitto</code></li>
+                      <li><strong>Port:</strong> <code>1883</code></li>
+                      <li>On the <strong>Security</strong> tab, set <code>Username</code> and <code>Password</code> to match your <code>.env</code>.</li>
+                      <li>Click <strong>Add</strong>.</li>
+                    </ul>
+                  </li>
+                  <li><strong>Topic:</strong> <code>+/sensor/+/+</code></li>
+                  <li><strong>Output:</strong> <em>a parsed JSON object</em></li>
+                  <li>Click <strong>Done</strong>.</li>
+                </ul>
+              </li>
+              <li>Click the red <strong>Deploy</strong> button (top-right).</li>
+              <li>On the right, click the bug-shaped tab to open the <strong>Debug pane</strong>.</li>
+            </ol>
+
+            <p>You should see a new debug entry appear roughly every half-second &mdash; one per published topic. Click any of them to expand the JSON. Compare it to the shape from Step&nbsp;2.</p>
+
+            <div class="callout info">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">When you&rsquo;ll really love this</div>
+                <p>Later in the course, when something doesn&rsquo;t show up on the dashboard, this Node-RED flow tells you instantly whether the message reached the broker at all. If you see it here but not on the dashboard, the bug is in the API. If you don&rsquo;t see it here, the bug is in the publisher.</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-5">
+                <span class="check-text">Node-RED debug pane shows incoming sensor messages with their JSON contents.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 6: Stop & stale ======================================= -->
+
+        <section id="step-6" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">6</div>
+            <div class="step-title-block">
+              <h3>Stop the publisher &mdash; watch it go stale</h3>
+              <div class="step-meta"><span>~5 minutes</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>Go back to the publisher terminal and press <code>Ctrl+C</code>. The script stops; no more messages are sent.</p>
+
+            <p>Watch the dashboard. The cards keep their last value &mdash; that&rsquo;s correct, the API still has the most recent reading in memory. After about 30 seconds, each card should grow a yellow <strong>STALE</strong> badge, and the timestamp underneath ticks up: &ldquo;30 s ago&rdquo;, &ldquo;1 min ago&rdquo;.</p>
+
+            <p>Restart the publisher. The badges disappear immediately as fresh readings arrive.</p>
+
+            <div class="callout info">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">Why &ldquo;stale&rdquo; matters</div>
+                <p>A real classroom sensor might lose Wi-Fi, run out of battery, or just disconnect. Showing the last value is fine; <em>showing it without telling the user it&rsquo;s old</em> is dangerous &mdash; teachers might think the room is still 22 °C when actually the sensor died an hour ago. Always surface freshness.</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-6">
+                <span class="check-text">Cards show STALE 30 s after the publisher stops, and clear when it restarts.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 7: Final ============================================== -->
+
+        <section id="step-7" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">7</div>
+            <div class="step-title-block">
+              <h3>Final verification</h3>
+              <div class="step-meta"><span>5 minutes</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>Tick everything below before declaring Phase 3 done. Phase 4 will assume readings make it from MQTT to the API reliably.</p>
+
+            <div class="final-checklist">
+              <h3>Phase 3 sign-off</h3>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-1">
+                  <span class="check-text">Dashboard shows <code>connected</code> when nothing is publishing.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-2">
+                  <span class="check-text">Running the test publisher makes both temperature and humidity cards appear within 1&nbsp;second.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-3">
+                  <span class="check-text">A second publisher with a different <code>--device</code> creates two more cards automatically.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-4">
+                  <span class="check-text">Node-RED debug shows the same readings as JSON, in the same shape as the docs.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-5">
+                  <span class="check-text">Stopping the publisher leaves the cards visible; they grow a STALE badge after ~30&nbsp;s.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-6">
+                  <span class="check-text">Restarting Mosquitto (<code>docker compose restart mosquitto</code>) doesn&rsquo;t crash the API; cards resume after a few seconds.</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- NEXT ====================================================== -->
+
+        <section id="next" class="next-up">
+          <h3>Phase 3 complete?</h3>
+          <p>You&rsquo;ve got a real-time data pipeline. A reading made on a laptop at one end of the school can show up on a touchscreen at the other end in under a second. Next phase: stop losing the data when the Pi reboots.</p>
+          <a href="index.html" class="btn disabled" data-require-all-checked aria-disabled="true">Phase 4: Save your data &nbsp;&rarr;</a>
+          <p style="margin-top: 14px; color: var(--text-faint); font-size: 0.88rem;">
+            (The button unlocks when every box above is ticked.)
+          </p>
+        </section>
+
+      </article>
+
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <span>&copy; Coderra.je &middot; Designed for Haute Vall&eacute;e School</span>
+    <span>Phase 3 of 7 &middot; Pi IoT Academy</span>
+  </div>
+</footer>
+
+<script src="js/main.js" defer></script>
+</body>
+</html>
