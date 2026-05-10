@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 7 &middot; Your First Module &mdash; Pi IoT Academy</title>
+<meta name="description" content="Phase 7 of the Pi IoT Academy: connect a Micro:bit or ESP32 to the platform, watch your own sensor on the dashboard, and capture snapshots for class discussion.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="phase" data-phase="phase-7">
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="brand" aria-label="Pi IoT Academy home">
+      <span class="brand-logo" aria-hidden="true">Pi</span>
+      <span>
+        <span class="brand-name">Pi IoT Academy</span><br>
+        <span class="brand-sub">Phase 7 &middot; Your First Module</span>
+      </span>
+    </a>
+    <nav class="topnav">
+      <a href="index.html">All phases</a>
+      <span class="progress-pill" data-progress-pill>0 / 0 done</span>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="container">
+      <p style="color: var(--text-faint); font-family: var(--font-mono); font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase; margin: 0 0 6px;">
+        Phase 07
+      </p>
+      <h1>Your first <span class="accent">module</span>.</h1>
+      <p class="lede">
+        The platform&rsquo;s ready. The dashboard is polished. Claude is
+        listening. Time to give it real, classroom-grown data: connect a
+        BBC Micro:bit (or ESP32 if you&rsquo;re feeling fancy), watch
+        <em>your</em> sensor appear on the screen, and take snapshots
+        through the lesson to compare. By the end of this phase you have
+        a complete, teachable IoT lab.
+      </p>
+      <div class="hero-meta">
+        <span class="tag tag-time"><span class="dot"></span>~60&ndash;90 min</span>
+        <span class="tag tag-difficulty"><span class="dot"></span>Difficulty: 3 / 3</span>
+        <span class="tag"><span class="dot"></span>Real hardware!</span>
+        <span class="tag"><span class="dot"></span>Final phase</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <div class="phase-layout">
+
+      <aside class="toc" aria-label="Steps in this phase">
+        <p class="toc-title">In this phase</p>
+        <ol>
+          <li><a href="#concept">What a module is</a></li>
+          <li><a href="#step-1">1. Pull &amp; rebuild</a></li>
+          <li><a href="#step-2">2. See the module tile</a></li>
+          <li><a href="#step-3">3. Pick your hardware</a></li>
+          <li><a href="#step-4">4. Path A: Micro:bit</a></li>
+          <li><a href="#step-5">5. Path B: ESP32</a></li>
+          <li><a href="#step-6">6. Snapshots through the lesson</a></li>
+          <li><a href="#step-7">7. Final verification</a></li>
+          <li><a href="#next">After Phase 7</a></li>
+        </ol>
+      </aside>
+
+      <article>
+
+        <!-- CONCEPT =================================================== -->
+
+        <section id="concept" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">0</div>
+            <div class="step-title-block">
+              <h3>What a module is</h3>
+              <div class="step-meta"><span>Read this first.</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>Up to now you&rsquo;ve only had fake data &mdash; the test publisher script. A <strong>module</strong> is a real, packaged classroom project: hardware + code + a lesson plan + a place on the dashboard. The platform is designed to host many of them; this is the first.</p>
+
+            <p>The <strong>Classroom Sensor Hub</strong> module includes:</p>
+
+            <div class="bom-grid">
+              <div class="bom-item">
+                <div class="bom-item-name">module.yaml</div>
+                <div class="bom-item-note">A small manifest file with the module&rsquo;s name, version, and which MQTT topics it owns.</div>
+              </div>
+              <div class="bom-item">
+                <div class="bom-item-name">microbit/</div>
+                <div class="bom-item-note">A MicroPython program for the Micro:bit V2, plus a tiny serial-to-MQTT bridge that runs on the Pi.</div>
+              </div>
+              <div class="bom-item">
+                <div class="bom-item-name">esp32/</div>
+                <div class="bom-item-note">An Arduino sketch for any ESP32 dev board, paired with a DHT22 sensor.</div>
+              </div>
+              <div class="bom-item">
+                <div class="bom-item-name">README.md</div>
+                <div class="bom-item-note">Lesson plan, troubleshooting guide, ideas for extension.</div>
+              </div>
+            </div>
+
+            <p style="margin-top: 16px;">Phase 7 also adds one new platform feature: <strong>snapshots</strong>. Tap a button on the Sensors page and the platform freezes the current state of every sensor into a row in the database. Useful for &ldquo;before&rdquo; / &ldquo;during&rdquo; / &ldquo;after&rdquo; comparisons during a lesson.</p>
+
+            <div class="callout info">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">Why two boards?</div>
+                <p>The <strong>Micro:bit</strong> is great for Year 7 — it&rsquo;s familiar, easy, and has a built-in temperature sensor. It connects via USB so your teacher just needs the cable.</p>
+                <p>The <strong>ESP32</strong> is a bigger jump but more grown-up: it has Wi-Fi, so each pair can run their own board independently across the room. We provide both so the lesson can scale up later.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 1 =================================================== -->
+
+        <section id="step-1" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">1</div>
+            <div class="step-title-block">
+              <h3>Pull and rebuild</h3>
+              <div class="step-meta"><span>~5 minutes &middot; on the Pi</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>The platform code has new bits: a <code>snapshots</code> table, an API to capture them, a button on the Sensors page, and the module folder.</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>terminal &middot; on the Pi</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>cd /opt/iot-platform
+git pull
+docker compose build api frontend
+docker compose up -d</code></pre>
+            </div>
+
+            <p>Watch the API logs:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>terminal &middot; on the Pi</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>docker compose logs -f api</code></pre>
+            </div>
+
+            <p>You should see Alembic apply the new migration:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>expected</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>INFO  alembic.runtime.migration  Running upgrade 0001 -> 0002, snapshots</code></pre>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-1">
+                <span class="check-text">Migration <code>0002</code> ran; the API restarted cleanly.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 2 =================================================== -->
+
+        <section id="step-2" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">2</div>
+            <div class="step-title-block">
+              <h3>See the module tile</h3>
+              <div class="step-meta"><span>~3 minutes</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>Open the dashboard. Click the <strong><span style="font-family: var(--font-mono);">▦</span> Modules</strong> icon in the sidebar.</p>
+
+            <p>The <strong>Classroom Sensor Hub</strong> tile should no longer be greyed out. It now has a green <strong>LIVE</strong> badge instead of <em>Phase 7</em>. Tap it &mdash; you&rsquo;ll be taken back to the Sensors page (because the module&rsquo;s data lives there).</p>
+
+            <p>Also notice on the Sensors page: when you have at least one sensor reading, a <strong>Take snapshot</strong> button appears in the top-right.</p>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-2">
+                <span class="check-text">The Classroom Sensor Hub tile is active; the Take snapshot button is visible.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 3: pick hardware ===================================== -->
+
+        <section id="step-3" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">3</div>
+            <div class="step-title-block">
+              <h3>Pick your hardware</h3>
+              <div class="step-meta"><span>~2 minutes</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>Pick the path that matches your kit:</p>
+
+            <div class="bom-grid">
+              <div class="bom-item">
+                <div class="bom-item-name">Path A — Micro:bit V2</div>
+                <div class="bom-item-note">USB cable + Mu Editor on a laptop. The Pi runs a tiny bridge to forward serial data to MQTT. Built-in temperature + light sensors.</div>
+              </div>
+              <div class="bom-item">
+                <div class="bom-item-name">Path B — ESP32 + DHT22</div>
+                <div class="bom-item-note">Arduino IDE + Wi-Fi. Each board talks MQTT directly. Real temperature + humidity from the DHT22.</div>
+              </div>
+            </div>
+
+            <p>Don&rsquo;t do both at the same time on your first try &mdash; pick one, get it working, then come back for the other if you have time.</p>
+
+            <div class="callout teacher">
+              <div class="callout-icon" aria-hidden="true">T</div>
+              <div class="callout-body">
+                <div class="callout-title">Your teacher will choose</div>
+                <p>Year 7s usually start with Path A (Micro:bit). Year 8&ndash;9s with Path B (ESP32). They&rsquo;ll tell the class which kit you&rsquo;re using today.</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-3">
+                <span class="check-text">I know which path I&rsquo;m doing today.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 4: Micro:bit ========================================= -->
+
+        <section id="step-4" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">4</div>
+            <div class="step-title-block">
+              <h3>Path A: Micro:bit</h3>
+              <div class="step-meta"><span>~25 minutes &middot; in pairs</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>The Micro:bit prints sensor readings over USB. The Pi listens on that USB and forwards each one as MQTT.</p>
+
+            <h4 style="margin-top: 18px;">4a. Flash the program</h4>
+
+            <ol>
+              <li>Plug the Micro:bit into the laptop with the USB cable. A new drive called <strong>MICROBIT</strong> appears.</li>
+              <li>Open <strong>Mu Editor</strong>. Set Mode to &ldquo;BBC micro:bit&rdquo;.</li>
+              <li>Open <code>modules/classroom-sensor-hub/microbit/main.py</code> from the platform repo.</li>
+              <li>Change <code>DEVICE_ID</code> at the top to a unique name, like <code>microbit-03</code> for pair 3.</li>
+              <li>Click <strong>Flash</strong>. The yellow LED on the back flickers; a heart briefly appears on the front. Done.</li>
+            </ol>
+
+            <h4 style="margin-top: 18px;">4b. Plug into the Pi and run the bridge</h4>
+
+            <p>Move the Micro:bit&rsquo;s USB cable from the laptop to the Pi. The Pi will recognise it as <code>/dev/ttyACM0</code>. Then on the Pi:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>terminal &middot; on the Pi (one-off install)</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>pip install pyserial paho-mqtt</code></pre>
+            </div>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>terminal &middot; on the Pi</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>cd /opt/iot-platform/modules/classroom-sensor-hub/microbit
+export MQTT_PASSWORD="&lt;your MQTT password from .env&gt;"
+python3 serial-bridge.py /dev/ttyACM0</code></pre>
+            </div>
+
+            <p>You should see lines tick by:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>expected</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>→ opening serial /dev/ttyACM0 @ 115200
+→ connecting to MQTT 127.0.0.1:1883 as platform
+✓ bridge running. Ctrl-C to stop.
+
+  → classroom/sensor/microbit-03/temperature: 23 celsius
+  → classroom/sensor/microbit-03/light: 145 lux</code></pre>
+            </div>
+
+            <h4 style="margin-top: 18px;">4c. Watch the dashboard</h4>
+
+            <p>Switch to the dashboard. Within a second you&rsquo;ll see two new cards: <code>microbit-03 / temperature</code> and <code>microbit-03 / light</code>. Cover the Micro:bit with your hand &mdash; the light value should drop sharply.</p>
+
+            <div class="callout warn">
+              <div class="callout-icon" aria-hidden="true">!</div>
+              <div class="callout-body">
+                <div class="callout-title">The temperature is high</div>
+                <p>The Micro:bit&rsquo;s &ldquo;temperature sensor&rdquo; is actually reading the chip itself, which runs hot. You&rsquo;ll see numbers like 25&ndash;30&nbsp;°C in a 20&nbsp;°C room. That&rsquo;s a teaching moment: real-world sensors have <em>quirks</em> &mdash; the data isn&rsquo;t lying, it just isn&rsquo;t measuring what you expect.</p>
+              </div>
+            </div>
+
+            <p>Tap the temperature card. The chart updates in real time. Tap <strong>Explain this reading</strong> &mdash; Claude will write a sensible-sounding explanation. (Claude doesn&rsquo;t know about the chip-warmth quirk; it might claim the room is warm. Discuss this in class!)</p>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-4">
+                <span class="check-text">My Micro:bit&rsquo;s temperature and light cards are on the dashboard, updating live.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 5: ESP32 ============================================= -->
+
+        <section id="step-5" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">5</div>
+            <div class="step-title-block">
+              <h3>Path B: ESP32</h3>
+              <div class="step-meta"><span>~25 minutes &middot; in pairs</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>An ESP32 has Wi-Fi built in. It connects directly to the platform&rsquo;s MQTT broker over the school network &mdash; no Pi-side bridge.</p>
+
+            <h4 style="margin-top: 18px;">5a. Wire the DHT22</h4>
+
+            <p>Three jumper wires:</p>
+            <div class="code-block">
+              <div class="code-block-header"><span>wiring</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>DHT22 pin     ESP32 pin
+---------     ---------
+VCC      ->   3V3
+DATA     ->   GPIO 4
+GND      ->   GND</code></pre>
+            </div>
+
+            <h4 style="margin-top: 18px;">5b. Flash the sketch</h4>
+
+            <ol>
+              <li>Open the Arduino IDE.</li>
+              <li>If you don&rsquo;t have ESP32 board support yet, follow the README in <code>modules/classroom-sensor-hub/esp32/</code> &mdash; it&rsquo;s a one-time install.</li>
+              <li>Open <code>modules/classroom-sensor-hub/esp32/sensor-hub.ino</code>.</li>
+              <li>Edit the configuration block at the top:
+                <ul>
+                  <li><code>WIFI_SSID</code>, <code>WIFI_PASS</code> &mdash; school Wi-Fi.</li>
+                  <li><code>MQTT_HOST</code> &mdash; your Pi&rsquo;s hostname (e.g. <code>pi-iot-01.local</code>).</li>
+                  <li><code>MQTT_PASS</code> &mdash; the MQTT password from <code>.env</code>.</li>
+                  <li><code>DEVICE_ID</code> &mdash; unique per board.</li>
+                </ul>
+              </li>
+              <li>Plug the ESP32 in. Tools &rarr; Board &rarr; <em>ESP32 Dev Module</em>; Tools &rarr; Port &rarr; the new device.</li>
+              <li>Click <strong>Upload</strong>.</li>
+              <li>Open Tools &rarr; Serial Monitor (115200 baud) and watch it boot.</li>
+            </ol>
+
+            <h4 style="margin-top: 18px;">5c. Watch the dashboard</h4>
+
+            <p>Once the serial monitor shows <code>MQTT: connecting&hellip; ok</code>, two new cards appear on the dashboard: <code>esp32-XX / temperature</code> and <code>esp32-XX / humidity</code>. Breathe near the DHT22 &mdash; the humidity should jump.</p>
+
+            <div class="callout warn">
+              <div class="callout-icon" aria-hidden="true">!</div>
+              <div class="callout-body">
+                <div class="callout-title">If MQTT connect fails</div>
+                <p>The most common causes: wrong password (re-check <code>.env</code> on the Pi), school Wi-Fi blocking port 1883 (try a phone hotspot), or the ESP32 can&rsquo;t resolve <code>.local</code> (use the Pi&rsquo;s IP address instead).</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-5">
+                <span class="check-text">My ESP32&rsquo;s temperature and humidity cards are on the dashboard.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 6: snapshots ========================================= -->
+
+        <section id="step-6" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">6</div>
+            <div class="step-title-block">
+              <h3>Snapshots through the lesson</h3>
+              <div class="step-meta"><span>~10 minutes</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>Once the room has at least one sensor publishing, take three snapshots through the lesson:</p>
+
+            <ol>
+              <li><strong>Start of class</strong> &mdash; before anyone&rsquo;s warmed the room up.</li>
+              <li><strong>Middle</strong> &mdash; mid-experiment.</li>
+              <li><strong>End</strong> &mdash; after the lesson&rsquo;s activity.</li>
+            </ol>
+
+            <p>Each tap of <strong>Take snapshot</strong> writes a row to the <code>snapshots</code> table with every sensor&rsquo;s current value. You&rsquo;ll see a confirmation like &ldquo;Saved snapshot #1 (4 sensors)&rdquo; appear next to the button.</p>
+
+            <p>To browse them, go to <strong>Settings</strong> &rarr; <em>Recent snapshots</em>. They&rsquo;re listed newest first with their ID, label, timestamp, and sensor count.</p>
+
+            <p>You can also pull a specific snapshot via the API:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>terminal &middot; anywhere</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>curl -s http://pi-iot-XX.local/api/snapshots/1 | python3 -m json.tool</code></pre>
+            </div>
+
+            <p>You&rsquo;ll get the full set of readings as they were at that moment &mdash; perfect for class discussion or a science write-up.</p>
+
+            <div class="callout info">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">Lab notebook moment</div>
+                <p>Real scientists save their measurements with timestamps so they can prove what they did. Snapshots are exactly that. Phase 4&rsquo;s database stores every individual reading; snapshots are just <em>marker pins</em> that say &ldquo;the room looked like this at this moment&rdquo;.</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-6">
+                <span class="check-text">Three snapshots saved; all visible in Settings.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 7: final ============================================ -->
+
+        <section id="step-7" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">7</div>
+            <div class="step-title-block">
+              <h3>Final verification</h3>
+              <div class="step-meta"><span>5 minutes</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>The class should be able to do everything below. Tick each one before declaring Phase&nbsp;7 (and the whole course!) done.</p>
+
+            <div class="final-checklist">
+              <h3>Phase 7 sign-off &mdash; the Year 7 user journey</h3>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-1">
+                  <span class="check-text">A student can flash a Micro:bit (or ESP32) with the provided program in &lt;&nbsp;5 minutes.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-2">
+                  <span class="check-text">Within 10 seconds of plugging it in, the student&rsquo;s sensor card appears on the dashboard.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-3">
+                  <span class="check-text">Tapping the card opens a chart that updates in real time.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-4">
+                  <span class="check-text">Tapping <strong>Explain this reading</strong> returns a sensible Year-7 sentence in &lt;&nbsp;4 seconds.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-5">
+                  <span class="check-text">Tapping <strong>Take snapshot</strong> writes a row visible in Settings.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-6">
+                  <span class="check-text">A second pair&rsquo;s sensor (different <code>DEVICE_ID</code>) shows up on the same dashboard alongside yours.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-7">
+                  <span class="check-text">Rebooting the Pi loses no readings and no snapshots; the dashboard rebuilds itself.</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- NEXT ====================================================== -->
+
+        <section id="next" class="next-up">
+          <h3>You did it.</h3>
+          <p>
+            You&rsquo;ve built a portable IoT and AI teaching terminal &mdash; from a blank Pi, through MQTT and a real database, a touchscreen UI, an LLM in the loop, and your own classroom hardware module. Real software engineers do this for a living. Real Year 7s now have a tool to ask &ldquo;what does this sensor mean?&rdquo; and get an answer.
+          </p>
+          <p>
+            What&rsquo;s next is up to you:
+          </p>
+          <ul style="margin: 8px 0 0; padding-left: 20px;">
+            <li>Build a <strong>second module</strong> &mdash; a weather station for the playground, a greenhouse monitor.</li>
+            <li>Add <strong>more sensors</strong> to the Sensor Hub: a soil-moisture probe, a CO₂ sensor.</li>
+            <li>Tweak the <strong>prompt template</strong> in <code>services/ai/app/prompts/</code> to give explanations a different audience or tone.</li>
+            <li>Show off the kit at a school open day.</li>
+          </ul>
+          <a href="index.html" class="btn">Back to all phases &nbsp;&rarr;</a>
+        </section>
+
+      </article>
+
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <span>&copy; Coderra.je &middot; Designed for Haute Vall&eacute;e School</span>
+    <span>Phase 7 of 7 &middot; Pi IoT Academy</span>
+  </div>
+</footer>
+
+<script src="js/main.js" defer></script>
+</body>
+</html>

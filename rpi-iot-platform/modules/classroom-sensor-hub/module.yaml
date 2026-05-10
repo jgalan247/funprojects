@@ -1,0 +1,45 @@
+# Classroom Sensor Hub
+# A first IoT module for Year 7-8 students. Combines Micro:bit and ESP32
+# boards with the platform's MQTT bus, dashboard, and Claude explanations.
+
+id: classroom-sensor-hub
+display_name: Classroom Sensor Hub
+version: 0.1.0
+description: |
+  Live readings from Micro:bit and ESP32 boards in your classroom.
+  Students flash a tiny program onto a board, plug it in, and watch
+  the temperature appear on the dashboard within a second.
+  An "Explain" button asks Claude to put the reading in plain English,
+  and a "Snapshot" button captures the room's state for later
+  discussion.
+
+audience: year-7-to-9
+
+authors:
+  - Coderra.je
+
+# What the module talks about. Future module discovery code will read
+# this to render tiles and filter the dashboard.
+mqtt:
+  publishes:
+    - classroom/sensor/+/temperature
+    - classroom/sensor/+/humidity
+    - classroom/sensor/+/light
+
+# Hardware that lessons assume. Not every kit needs every item.
+hardware:
+  - name: BBC Micro:bit V2
+    optional: true
+    notes: Built-in temperature + light sensors. Connects via USB serial.
+  - name: ESP32 dev board (any)
+    optional: true
+    notes: Wi-Fi-enabled, talks MQTT directly. Pair with a DHT22 for humidity.
+  - name: DHT22 sensor
+    optional: true
+    notes: Temperature + humidity, used by the ESP32 sketch.
+
+# Files in this directory:
+#   README.md                  Lesson plan and setup notes.
+#   microbit/main.py           MicroPython program for the Micro:bit V2.
+#   microbit/serial-bridge.py  Pi-side script: USB serial -> MQTT.
+#   esp32/sensor-hub.ino       Arduino sketch for the ESP32.

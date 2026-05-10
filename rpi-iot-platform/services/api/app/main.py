@@ -27,6 +27,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import ai as ai_api
 from app.api import sensors as sensors_api
+from app.api import snapshots as snapshots_api
 from app.api import system as system_api
 from app.db.engine import make_engine, make_sessionmaker
 from app.db.migrate import upgrade_head
@@ -195,4 +196,5 @@ async def health() -> dict[str, str]:
 app.include_router(sensors_api.router, prefix="/api")
 app.include_router(system_api.router, prefix="/api")
 app.include_router(ai_api.router, prefix="/api")
+app.include_router(snapshots_api.router, prefix="/api")
 app.include_router(sensors_ws.router)
