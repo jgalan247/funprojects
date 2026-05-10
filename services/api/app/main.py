@@ -25,6 +25,7 @@ from apscheduler.triggers.cron import CronTrigger
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api import ai as ai_api
 from app.api import sensors as sensors_api
 from app.api import system as system_api
 from app.db.engine import make_engine, make_sessionmaker
@@ -193,4 +194,5 @@ async def health() -> dict[str, str]:
 
 app.include_router(sensors_api.router, prefix="/api")
 app.include_router(system_api.router, prefix="/api")
+app.include_router(ai_api.router, prefix="/api")
 app.include_router(sensors_ws.router)

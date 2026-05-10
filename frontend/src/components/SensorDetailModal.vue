@@ -2,6 +2,7 @@
 import { ref, watch, computed } from 'vue'
 import { useReadings, type Reading } from '../composables/useReadings'
 import LineChart, { type ChartPoint } from './LineChart.vue'
+import AiExplainer from './AiExplainer.vue'
 
 const props = defineProps<{ sensorId: string | null }>()
 const emit = defineEmits<{ close: [] }>()
@@ -134,6 +135,12 @@ function onBackdropClick(e: MouseEvent) {
           <p class="font-mono text-[0.7rem] text-slate-500 mt-4">
             <strong>{{ history.length }}</strong> readings shown · auto-updating
           </p>
+
+          <AiExplainer
+            v-if="props.sensorId"
+            :sensor-id="props.sensorId"
+            :has-reading="!!sensor"
+          />
         </section>
       </div>
     </div>

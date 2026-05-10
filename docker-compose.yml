@@ -64,8 +64,9 @@ services:
       - iotnet
 
   # ---------------------------------------------------------------------------
-  # AI service — wraps the Anthropic SDK. v1 has /health only; real
-  # /ai/explain endpoint lands in Phase 6.
+  # AI service — Claude Haiku wrapper. /ai/explain renders the template,
+  # calls Anthropic (or the offline stub when no key is configured), and
+  # writes ai_prompts + ai_responses rows to the shared SQLite database.
   # ---------------------------------------------------------------------------
   ai:
     build:
@@ -77,6 +78,8 @@ services:
     ports:
       - "8001:8001"
     env_file: .env
+    volumes:
+      - ./data/sqlite:/data/sqlite
     networks:
       - iotnet
 

@@ -1,10 +1,17 @@
 <script setup lang="ts">
 import { onMounted, computed } from 'vue'
 import { useSystemLogs } from '../composables/useSystemLogs'
+import { useAiUsage } from '../composables/useAiUsage'
+import { useAiInfo } from '../composables/useAiInfo'
 
 const { logs, loading, error, refresh } = useSystemLogs()
+const { usage, refresh: refreshUsage } = useAiUsage()
+const { info: aiInfo } = useAiInfo()
 
-onMounted(() => refresh(50))
+onMounted(() => {
+  refresh(50)
+  refreshUsage(7)
+})
 
 function levelClass(level: string): string {
   switch (level) {
@@ -68,6 +75,50 @@ const groupedByEvent = computed(() => {
           <dd class="font-mono text-sm">30 days, 03:00 UTC daily</dd>
         </div>
       </dl>
+    </section>
+
+    <!-- AI usage -->
+    <section>
+      <header class="flex items-baseline justify-between mb-3">
+        <h2 class="text-sm font-extrabold uppercase tracking-widest text-slate-500">
+          AI usage (last 7 days)
+        </h2>
+        <span
+          v-if="aiInfo?.fallback"
+          class="text-[0.7rem] px-2 py-0.5 rounded-full bg-yellow-500/15 text-yellow-300 font-bold uppercase tracking-wider"
+        >
+          offline stub
+        </span>
+        <span
+          v-else-if="aiInfo"
+          class="text-[0.7rem] font-mono text-slate-500"
+        >
+          {{ aiInfo.model }}
+        </span>
+      </header>
+
+      <div
+        v-if="usage"
+        class="grid grid-cols-2 sm:grid-cols-4 gap-3"
+      >
+        <div class="rounded-xl border border-slate-800 bg-slate-900/40 p-4">
+          <div class="text-[0.7rem] uppercase tracking-widest text-slate-500 font-bold">Calls</div>
+          <div class="text-2xl font-extrabold tabular-nums mt-1">{{ usage.calls }}</div>
+        </div>
+        <div class="rounded-xl border border-slate-800 bg-slate-900/40 p-4">
+          <div class="text-[0.7rem] uppercase tracking-widest text-slate-500 font-bold">Successes</div>
+          <div class="text-2xl font-extrabold tabular-nums mt-1 text-pi-green-soft">{{ usage.successes }}</div>
+        </div>
+        <div class="rounded-xl border border-slate-800 bg-slate-900/40 p-4">
+          <div class="text-[0.7rem] uppercase tracking-widest text-slate-500 font-bold">Input tokens</div>
+          <div class="text-2xl font-extrabold tabular-nums mt-1">{{ usage.input_tokens.toLocaleString() }}</div>
+        </div>
+        <div class="rounded-xl border border-slate-800 bg-slate-900/40 p-4">
+          <div class="text-[0.7rem] uppercase tracking-widest text-slate-500 font-bold">Output tokens</div>
+          <div class="text-2xl font-extrabold tabular-nums mt-1">{{ usage.output_tokens.toLocaleString() }}</div>
+        </div>
+      </div>
+      <p v-else class="text-slate-500 text-sm">Loading usage…</p>
     </section>
 
     <!-- System logs -->
