@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 2 &middot; Install the Platform &mdash; Pi IoT Academy</title>
+<meta name="description" content="Phase 2 of the Pi IoT Academy: install Docker and bring up Mosquitto, Node-RED, FastAPI, the AI service, and the Vue dashboard with a single command.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="phase" data-phase="phase-2">
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="brand" aria-label="Pi IoT Academy home">
+      <span class="brand-logo" aria-hidden="true">Pi</span>
+      <span>
+        <span class="brand-name">Pi IoT Academy</span><br>
+        <span class="brand-sub">Phase 2 &middot; Install the Platform</span>
+      </span>
+    </a>
+    <nav class="topnav">
+      <a href="index.html">All phases</a>
+      <span class="progress-pill" data-progress-pill>0 / 0 done</span>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="container">
+      <p style="color: var(--text-faint); font-family: var(--font-mono); font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase; margin: 0 0 6px;">
+        Phase 02
+      </p>
+      <h1>Install the <span class="accent">platform</span>.</h1>
+      <p class="lede">
+        Last phase you built the Pi. This phase you&rsquo;ll fill it with
+        software &mdash; five small programs that work together to make the
+        whole IoT lab. The clever bit: one command starts all five.
+      </p>
+      <div class="hero-meta">
+        <span class="tag tag-time"><span class="dot"></span>~60&ndash;90 min</span>
+        <span class="tag tag-difficulty"><span class="dot"></span>Difficulty: 2 / 3</span>
+        <span class="tag"><span class="dot"></span>Lots of typing</span>
+        <span class="tag"><span class="dot"></span>Software lesson</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <div class="phase-layout">
+
+      <aside class="toc" aria-label="Steps in this phase">
+        <p class="toc-title">In this phase</p>
+        <ol>
+          <li><a href="#what-youll-install">What you&rsquo;ll install</a></li>
+          <li><a href="#step-1">1. Install Docker</a></li>
+          <li><a href="#step-2">2. Get the project files</a></li>
+          <li><a href="#step-3">3. Configure <code>.env</code></a></li>
+          <li><a href="#step-4">4. Start the platform</a></li>
+          <li><a href="#step-5">5. Verify each service</a></li>
+          <li><a href="#step-6">6. Round-trip an MQTT message</a></li>
+          <li><a href="#step-7">7. Final verification</a></li>
+          <li><a href="#next">What&rsquo;s next</a></li>
+        </ol>
+      </aside>
+
+      <article>
+
+        <!-- WHAT YOU'LL INSTALL ====================================== -->
+
+        <section id="what-youll-install" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">0</div>
+            <div class="step-title-block">
+              <h3>What you&rsquo;re about to install</h3>
+              <div class="step-meta"><span>Read this first &mdash; it&rsquo;s the map.</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+
+            <p>The platform is made of five services. A <strong>service</strong> is just a program that does one job and runs in the background. They talk to each other over the network.</p>
+
+            <div class="bom-grid">
+              <div class="bom-item">
+                <div class="bom-item-name">Mosquitto</div>
+                <div class="bom-item-note">The <strong>MQTT broker</strong> &mdash; the message post office. Sensors send messages here; everyone who&rsquo;s interested picks them up.</div>
+              </div>
+              <div class="bom-item">
+                <div class="bom-item-name">Node-RED</div>
+                <div class="bom-item-note">A visual programming tool. We&rsquo;ll use it to build small automations and to peek at MQTT messages while we&rsquo;re developing.</div>
+              </div>
+              <div class="bom-item">
+                <div class="bom-item-name">FastAPI</div>
+                <div class="bom-item-note">The main <strong>API</strong>. It saves sensor readings to the database and feeds the dashboard.</div>
+              </div>
+              <div class="bom-item">
+                <div class="bom-item-name">AI service</div>
+                <div class="bom-item-note">A separate small API that talks to Claude. We&rsquo;ll wire it up properly in Phase 6.</div>
+              </div>
+              <div class="bom-item">
+                <div class="bom-item-name">Vue dashboard</div>
+                <div class="bom-item-note">The webpage that runs on your touchscreen. You&rsquo;ll design it in Phase 5.</div>
+              </div>
+            </div>
+
+            <p style="margin-top: 18px;">All five run inside <strong>Docker</strong>. Docker is a tool that puts each service in its own &ldquo;box&rdquo; (called a <em>container</em>) so they can&rsquo;t mess with each other and they all start the same way on every Pi. One file, <code>docker-compose.yml</code>, tells Docker how to run them together.</p>
+
+            <div class="callout info">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">Why containers?</div>
+                <p>Without Docker you&rsquo;d install five programs by hand, each with its own version of Python or Node, each with its own config files. Containers bundle the program <em>and</em> everything it needs into one box. Reset broken? Throw the box away and start a new one.</p>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- STEP 1: Install Docker ==================================== -->
+
+        <section id="step-1" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">1</div>
+            <div class="step-title-block">
+              <h3>Install Docker</h3>
+              <div class="step-meta"><span>~10 minutes &middot; on the Pi</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>SSH into your Pi (you set this up in Phase 1) and run the official install script:</p>
+
+            <div class="code-block">
+              <div class="code-block-header">
+                <span>terminal &middot; on the Pi</span>
+                <button class="copy-btn" type="button">Copy</button>
+              </div>
+              <pre><code>curl -fsSL https://get.docker.com | sudo sh</code></pre>
+            </div>
+
+            <p>This downloads a script from Docker and runs it. It takes 3&ndash;5 minutes. When it finishes, add yourself to the <code>docker</code> group so you don&rsquo;t have to type <code>sudo</code> every time:</p>
+
+            <div class="code-block">
+              <div class="code-block-header">
+                <span>terminal &middot; on the Pi</span>
+                <button class="copy-btn" type="button">Copy</button>
+              </div>
+              <pre><code>sudo usermod -aG docker $USER</code></pre>
+            </div>
+
+            <p>For that change to take effect, log out and log back in. (If you&rsquo;re on SSH, just <code>exit</code> and SSH back in.) Then check Docker is alive:</p>
+
+            <div class="code-block">
+              <div class="code-block-header">
+                <span>terminal &middot; on the Pi</span>
+                <button class="copy-btn" type="button">Copy</button>
+              </div>
+              <pre><code>docker version
+docker compose version</code></pre>
+            </div>
+
+            <p>You should see version numbers, no errors. If you see &ldquo;permission denied&rdquo;, you&rsquo;ve forgotten the log-out / log-in.</p>
+
+            <div class="callout info">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">What does <code>curl &hellip; | sudo sh</code> do?</div>
+                <p><code>curl</code> downloads a file from a URL. The pipe <code>|</code> hands it straight to <code>sh</code>, which runs it as a shell script with administrator privileges. You should only ever do this with scripts from trusted sources &mdash; <code>get.docker.com</code> is one of them.</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-1">
+                <span class="check-text">Docker installed; <code>docker version</code> works without <code>sudo</code>.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 2: Get the project files ============================= -->
+
+        <section id="step-2" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">2</div>
+            <div class="step-title-block">
+              <h3>Get the project files</h3>
+              <div class="step-meta"><span>~5 minutes &middot; on the Pi</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>The platform code lives in a Git repository. <strong>Git</strong> is a tool for tracking and sharing files. We&rsquo;ll <em>clone</em> the repo &mdash; copy it from the internet to your Pi.</p>
+
+            <div class="callout teacher">
+              <div class="callout-icon" aria-hidden="true">T</div>
+              <div class="callout-body">
+                <div class="callout-title">Your teacher will give you</div>
+                <p>The repository URL. Replace <code>&lt;REPO_URL&gt;</code> in the commands below with the one on the board.</p>
+              </div>
+            </div>
+
+            <p>Move into the folder you set up in Phase 1, then clone:</p>
+
+            <div class="code-block">
+              <div class="code-block-header">
+                <span>terminal &middot; on the Pi</span>
+                <button class="copy-btn" type="button">Copy</button>
+              </div>
+              <pre><code>cd /opt/iot-platform
+git clone &lt;REPO_URL&gt; .
+ls</code></pre>
+            </div>
+
+            <p>The dot at the end of <code>git clone</code> means &ldquo;clone into the current folder&rdquo;. The <code>ls</code> at the end shows you what arrived. You should see at least:</p>
+
+            <div class="code-block">
+              <div class="code-block-header">
+                <span>expected files</span>
+                <button class="copy-btn" type="button">Copy</button>
+              </div>
+              <pre><code>docker-compose.yml
+.env.example
+infra/
+services/
+frontend/</code></pre>
+            </div>
+
+            <p>If <code>git</code> isn&rsquo;t installed, install it:</p>
+
+            <div class="code-block">
+              <div class="code-block-header">
+                <span>terminal &middot; on the Pi</span>
+                <button class="copy-btn" type="button">Copy</button>
+              </div>
+              <pre><code>sudo apt install -y git</code></pre>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-2">
+                <span class="check-text">The project files are in <code>/opt/iot-platform</code>; <code>docker-compose.yml</code> is there.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 3: Configure .env ==================================== -->
+
+        <section id="step-3" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">3</div>
+            <div class="step-title-block">
+              <h3>Configure your <code>.env</code></h3>
+              <div class="step-meta"><span>~5 minutes &middot; on the Pi</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>Some settings change between Pis &mdash; passwords, secret keys, your specific Wi-Fi name. They live in a file called <code>.env</code>, which is <em>never</em> committed to Git. There&rsquo;s a template called <code>.env.example</code> that we copy and edit.</p>
+
+            <div class="code-block">
+              <div class="code-block-header">
+                <span>terminal &middot; on the Pi</span>
+                <button class="copy-btn" type="button">Copy</button>
+              </div>
+              <pre><code>cd /opt/iot-platform
+cp .env.example .env
+nano .env</code></pre>
+            </div>
+
+            <p><code>nano</code> is a simple text editor. You should see something like this:</p>
+
+            <div class="code-block">
+              <div class="code-block-header">
+                <span>.env.example &middot; what you need to change</span>
+                <button class="copy-btn" type="button">Copy</button>
+              </div>
+              <pre><code># MQTT credentials &mdash; change the password
+MQTT_USER=platform
+MQTT_PASSWORD=change-me-please
+
+# Anthropic API key &mdash; leave blank for now (we'll add it in Phase 6)
+ANTHROPIC_API_KEY=
+ANTHROPIC_MODEL=claude-haiku-4-5-20251001
+
+# Database file
+DB_PATH=/data/sqlite/platform.db</code></pre>
+            </div>
+
+            <p>For now, the only thing you <em>must</em> change is <code>MQTT_PASSWORD</code>. Pick something memorable but not obvious &mdash; not <code>password</code>, not your name, not <code>1234</code>. Save with <code>Ctrl+O</code>, <code>Enter</code>, then exit with <code>Ctrl+X</code>.</p>
+
+            <div class="callout warn">
+              <div class="callout-icon" aria-hidden="true">!</div>
+              <div class="callout-body">
+                <div class="callout-title">Never share your <code>.env</code></div>
+                <p>This file holds passwords. It&rsquo;s already in <code>.gitignore</code> so Git ignores it &mdash; but don&rsquo;t copy-paste it into Slack, email, or a screenshot. Treat it like the password to your school account.</p>
+              </div>
+            </div>
+
+            <p>Now create the MQTT password file Mosquitto needs:</p>
+
+            <div class="code-block">
+              <div class="code-block-header">
+                <span>terminal &middot; on the Pi</span>
+                <button class="copy-btn" type="button">Copy</button>
+              </div>
+              <pre><code>./scripts/bootstrap-mqtt-passwd.sh</code></pre>
+            </div>
+
+            <p>That script reads <code>MQTT_USER</code> and <code>MQTT_PASSWORD</code> from <code>.env</code> and writes a hashed copy to <code>infra/mosquitto/passwd</code>. Mosquitto will check the hash, not the plain password, when clients connect.</p>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-3">
+                <span class="check-text"><code>.env</code> exists with a real MQTT password; <code>infra/mosquitto/passwd</code> exists.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 4: Start the platform ================================ -->
+
+        <section id="step-4" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">4</div>
+            <div class="step-title-block">
+              <h3>Start the platform</h3>
+              <div class="step-meta"><span>~10 minutes &middot; mostly waiting</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>Here&rsquo;s the magic command:</p>
+
+            <div class="code-block">
+              <div class="code-block-header">
+                <span>terminal &middot; on the Pi</span>
+                <button class="copy-btn" type="button">Copy</button>
+              </div>
+              <pre><code>docker compose up -d</code></pre>
+            </div>
+
+            <p>Reading that out loud: &ldquo;Docker, compose <em>up</em> the services in detached mode.&rdquo; <code>-d</code> means &ldquo;run in the background&rdquo; &mdash; without it, your terminal would be filled with logs from all five services at once.</p>
+
+            <p>The first time you run this, Docker has to download (&ldquo;pull&rdquo;) the images for each service. That can take 5&ndash;10 minutes on school Wi-Fi. You&rsquo;ll see lines like:</p>
+
+            <div class="code-block">
+              <div class="code-block-header">
+                <span>example output</span>
+                <button class="copy-btn" type="button">Copy</button>
+              </div>
+              <pre><code>[+] Pulling 47/47
+ ✔ mosquitto Pulled    32.1s
+ ✔ node-red  Pulled    58.4s
+ ✔ api       Built      2.7s
+ ✔ ai        Built      2.4s
+ ✔ frontend  Built      4.1s
+[+] Running 5/5
+ ✔ Container iot-mosquitto  Started
+ ✔ Container iot-node-red   Started
+ ✔ Container iot-api        Started
+ ✔ Container iot-ai         Started
+ ✔ Container iot-frontend   Started</code></pre>
+            </div>
+
+            <p>Once it&rsquo;s done, check what&rsquo;s running:</p>
+
+            <div class="code-block">
+              <div class="code-block-header">
+                <span>terminal &middot; on the Pi</span>
+                <button class="copy-btn" type="button">Copy</button>
+              </div>
+              <pre><code>docker compose ps</code></pre>
+            </div>
+
+            <p>You should see five rows, each with <code>Up</code> in the STATUS column. If any say <code>Restarting</code> or <code>Exited</code>, check that service&rsquo;s logs:</p>
+
+            <div class="code-block">
+              <div class="code-block-header">
+                <span>terminal &middot; on the Pi</span>
+                <button class="copy-btn" type="button">Copy</button>
+              </div>
+              <pre><code>docker compose logs api          # one service
+docker compose logs -f           # all services, live
+docker compose logs --tail=50 api # last 50 lines</code></pre>
+            </div>
+
+            <p>Press <code>Ctrl+C</code> to stop following logs. (That doesn&rsquo;t stop the service &mdash; just stops showing you the logs.)</p>
+
+            <div class="callout info">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">Useful Docker commands</div>
+                <p style="margin-bottom: 6px;">A small toolkit you&rsquo;ll use throughout the course:</p>
+                <ul style="margin: 0;">
+                  <li><code>docker compose ps</code> &mdash; what&rsquo;s running.</li>
+                  <li><code>docker compose logs &lt;service&gt;</code> &mdash; show logs.</li>
+                  <li><code>docker compose restart &lt;service&gt;</code> &mdash; turn it off and on again.</li>
+                  <li><code>docker compose down</code> &mdash; stop everything.</li>
+                  <li><code>docker compose up -d</code> &mdash; start everything.</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-4">
+                <span class="check-text">All five services show <code>Up</code> in <code>docker compose ps</code>.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 5: Verify each service =============================== -->
+
+        <section id="step-5" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">5</div>
+            <div class="step-title-block">
+              <h3>Verify each service</h3>
+              <div class="step-meta"><span>~10 minutes</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>&ldquo;Up&rdquo; in Docker just means the container started. It doesn&rsquo;t mean the service inside actually works. Let&rsquo;s prove each one.</p>
+
+            <p>Find your Pi&rsquo;s hostname (it should be <code>pi-iot-XX</code> from Phase 1):</p>
+
+            <div class="code-block">
+              <div class="code-block-header">
+                <span>terminal &middot; on the Pi</span>
+                <button class="copy-btn" type="button">Copy</button>
+              </div>
+              <pre><code>hostname</code></pre>
+            </div>
+
+            <p>From now on, replace <code>pi-iot-XX</code> in every command with the hostname your Pi reports.</p>
+
+            <h4 style="margin-top: 22px;">5a. The Vue dashboard</h4>
+            <p>On the Pi&rsquo;s touchscreen, open Chromium and go to:</p>
+            <div class="code-block">
+              <div class="code-block-header"><span>browser</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>http://localhost/</code></pre>
+            </div>
+            <p>Or from your laptop on the same Wi-Fi:</p>
+            <div class="code-block">
+              <div class="code-block-header"><span>browser</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>http://pi-iot-XX.local/</code></pre>
+            </div>
+            <p>You should see a placeholder page that says &ldquo;Pi IoT Platform&rdquo;. It&rsquo;s empty for now &mdash; you&rsquo;ll build the real dashboard in Phase 5.</p>
+
+            <h4 style="margin-top: 22px;">5b. Node-RED</h4>
+            <div class="code-block">
+              <div class="code-block-header"><span>browser</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>http://pi-iot-XX.local:1880/</code></pre>
+            </div>
+            <p>Node-RED&rsquo;s flow editor should load &mdash; a blank canvas with a sidebar of &ldquo;nodes&rdquo;. We&rsquo;ll use this in Phase 3.</p>
+
+            <h4 style="margin-top: 22px;">5c. The API</h4>
+            <div class="code-block">
+              <div class="code-block-header"><span>terminal &middot; on the Pi</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>curl http://localhost:8000/health</code></pre>
+            </div>
+            <p>Should print:</p>
+            <div class="code-block">
+              <div class="code-block-header"><span>expected</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>{"status":"ok"}</code></pre>
+            </div>
+
+            <h4 style="margin-top: 22px;">5d. The AI service</h4>
+            <div class="code-block">
+              <div class="code-block-header"><span>terminal &middot; on the Pi</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>curl http://localhost:8001/health</code></pre>
+            </div>
+            <p>Same response: <code>{"status":"ok"}</code>. (No API key yet, that&rsquo;s fine &mdash; the service is alive.)</p>
+
+            <div class="callout info">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">What is a <code>/health</code> endpoint?</div>
+                <p>A tiny URL that every service offers, just to say &ldquo;I&rsquo;m alive&rdquo;. We&rsquo;ll use these in monitoring and in Docker&rsquo;s health checks. They&rsquo;re a habit you should pick up &mdash; every service you ever build should have one.</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-5">
+                <span class="check-text">Vue page loads, Node-RED loads, both <code>/health</code> endpoints return <code>{"status":"ok"}</code>.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 6: MQTT round-trip =================================== -->
+
+        <section id="step-6" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">6</div>
+            <div class="step-title-block">
+              <h3>Round-trip an MQTT message</h3>
+              <div class="step-meta"><span>~10 minutes &middot; works best with a partner</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>This is the showpiece of Phase 2. You&rsquo;ll send a message from one laptop, through the Pi&rsquo;s MQTT broker, to a different laptop &mdash; without writing any code.</p>
+
+            <p>On <strong>both</strong> laptops, install the MQTT command-line tools (one-off, ~30 seconds each):</p>
+
+            <div class="code-block">
+              <div class="code-block-header">
+                <span>terminal &middot; on each laptop (Linux/Mac)</span>
+                <button class="copy-btn" type="button">Copy</button>
+              </div>
+              <pre><code>sudo apt install -y mosquitto-clients   # Debian/Ubuntu/Raspberry Pi OS
+brew install mosquitto                  # macOS</code></pre>
+            </div>
+
+            <p>On <strong>laptop A</strong>, listen for messages on a test topic:</p>
+
+            <div class="code-block">
+              <div class="code-block-header">
+                <span>terminal &middot; laptop A (the listener)</span>
+                <button class="copy-btn" type="button">Copy</button>
+              </div>
+              <pre><code>mosquitto_sub -h pi-iot-XX.local -p 1883 \
+  -u platform -P "&lt;your MQTT password&gt;" \
+  -t "dev/hello"</code></pre>
+            </div>
+
+            <p>The <code>\</code> at the end of a line means &ldquo;the command continues on the next line&rdquo;. After running it, the terminal will sit there and wait. That&rsquo;s correct &mdash; it&rsquo;s listening.</p>
+
+            <p>On <strong>laptop B</strong>, send a message to the same topic:</p>
+
+            <div class="code-block">
+              <div class="code-block-header">
+                <span>terminal &middot; laptop B (the sender)</span>
+                <button class="copy-btn" type="button">Copy</button>
+              </div>
+              <pre><code>mosquitto_pub -h pi-iot-XX.local -p 1883 \
+  -u platform -P "&lt;your MQTT password&gt;" \
+  -t "dev/hello" \
+  -m "Hello from laptop B!"</code></pre>
+            </div>
+
+            <p>Watch laptop A. The message should appear instantly:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>laptop A output</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>Hello from laptop B!</code></pre>
+            </div>
+
+            <p>Press <code>Ctrl+C</code> on laptop A to stop listening. Now swap roles &mdash; laptop A sends, laptop B listens. Try a different topic, like <code>dev/temperature</code>, and a different message.</p>
+
+            <div class="callout info">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">What just happened?</div>
+                <p>Laptop B sent a message to the broker on the Pi. The broker saw that laptop A had subscribed to that topic, so it forwarded the message. Neither laptop knew about the other &mdash; they only knew about the broker. That&rsquo;s how every IoT device on the platform will work.</p>
+              </div>
+            </div>
+
+            <div class="callout warn">
+              <div class="callout-icon" aria-hidden="true">!</div>
+              <div class="callout-body">
+                <div class="callout-title">Connection refused?</div>
+                <p>If <code>mosquitto_sub</code> says &ldquo;Connection Refused: not authorised&rdquo;, the password is wrong. Check the password is the one in <code>.env</code> on the Pi. If it says &ldquo;No route to host&rdquo;, your laptop can&rsquo;t reach the Pi &mdash; check it&rsquo;s on the same Wi-Fi.</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-6">
+                <span class="check-text">Two laptops sent messages to each other through the Pi&rsquo;s MQTT broker.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 7 / FINAL ============================================ -->
+
+        <section id="step-7" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">7</div>
+            <div class="step-title-block">
+              <h3>Final verification</h3>
+              <div class="step-meta"><span>5 minutes</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>Tick everything below before declaring Phase 2 finished. Phase 3 assumes the bus is working and the API is reachable.</p>
+
+            <div class="final-checklist">
+              <h3>Phase 2 sign-off</h3>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-1">
+                  <span class="check-text"><code>docker compose ps</code> shows all five services in the <code>Up</code> state.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-2">
+                  <span class="check-text"><code>http://pi-iot-XX.local/</code> loads the placeholder dashboard from your laptop.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-3">
+                  <span class="check-text"><code>http://pi-iot-XX.local:1880/</code> loads the Node-RED editor.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-4">
+                  <span class="check-text">Both <code>/health</code> endpoints (port 8000 and 8001) return <code>{"status":"ok"}</code>.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-5">
+                  <span class="check-text">An MQTT message round-trips between two laptops via the Pi.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-6">
+                  <span class="check-text">After a Pi reboot, all services come back up automatically.</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="callout info" style="margin-top: 18px;">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">Test that last one</div>
+                <p>Reboot the Pi (<code>sudo reboot</code>). After it comes back, SSH in and run <code>docker compose ps</code> &mdash; everything should be <code>Up</code> again. If not, something&rsquo;s missing in the compose file&rsquo;s <code>restart</code> policy.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- NEXT ====================================================== -->
+
+        <section id="next" class="next-up">
+          <h3>Phase 2 complete?</h3>
+          <p>You&rsquo;ve installed a five-service IoT platform with one command and proved it works. Real software engineers do this for a living. Next phase you&rsquo;ll send your first sensor reading through the bus and see it on the Pi&rsquo;s screen.</p>
+          <a href="index.html" class="btn disabled" data-require-all-checked aria-disabled="true">Phase 3: Talk over MQTT &nbsp;&rarr;</a>
+          <p style="margin-top: 14px; color: var(--text-faint); font-size: 0.88rem;">
+            (Phase 3 unlocks here when every box is ticked. We&rsquo;re writing it for next lesson.)
+          </p>
+        </section>
+
+      </article>
+
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <span>&copy; Coderra.je &middot; Designed for Haute Vall&eacute;e School</span>
+    <span>Phase 2 of 7 &middot; Pi IoT Academy</span>
+  </div>
+</footer>
+
+<script src="js/main.js" defer></script>
+</body>
+</html>
