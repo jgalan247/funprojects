@@ -1,4 +1,4 @@
-import { ref, onMounted, onUnmounted, type Ref } from 'vue'
+import { ref } from 'vue'
 
 export interface Reading {
   sensor_id: string
@@ -23,70 +23,70 @@ interface ReadingMessage {
 
 type Message = SnapshotMessage | ReadingMessage
 
-export interface UseReadings {
-  readings: Ref<Map<string, Reading>>
-  connected: Ref<boolean>
-}
+/* Singleton — every view that calls useReadings() shares the same Map and
+   WebSocket. The connection is opened on first call and lives for the
+   lifetime of the page (the kiosk runs forever). */
 
-/**
- * Subscribes to /ws/sensors and exposes a reactive map of the latest reading
- * per sensor. Auto-reconnects with a fixed back-off if the socket drops.
- */
-export function useReadings(reconnectMs = 2000): UseReadings {
-  const readings = ref(new Map<string, Reading>())
-  const connected = ref(false)
+const readings = ref(new Map<string, Reading>())
+const connected = ref(false)
 
-  let socket: WebSocket | null = null
-  let reconnectTimer: ReturnType<typeof setTimeout> | null = null
-  let stopped = false
+let socket: WebSocket | null = null
+let reconnectTimer: ReturnType<typeof setTimeout> | null = null
+let started = false
 
-  function connect(): void {
-    if (stopped) return
-    const proto = window.location.protocol === 'https:' ? 'wss' : 'ws'
-    const url = `${proto}://${window.location.host}/ws/sensors`
-    socket = new WebSocket(url)
+const RECONNECT_MS = 2000
 
-    socket.onopen = () => {
-      connected.value = true
-    }
+function connect(): void {
+  const proto = window.location.protocol === 'https:' ? 'wss' : 'ws'
+  const url = `${proto}://${window.location.host}/ws/sensors`
+  socket = new WebSocket(url)
 
-    socket.onclose = () => {
-      connected.value = false
-      socket = null
-      if (!stopped) {
-        reconnectTimer = setTimeout(connect, reconnectMs)
-      }
-    }
-
-    socket.onerror = () => {
-      // No-op — the close handler will arrange the reconnect.
-    }
-
-    socket.onmessage = (event: MessageEvent<string>) => {
-      let msg: Message
-      try {
-        msg = JSON.parse(event.data) as Message
-      } catch {
-        return
-      }
-      if (msg.type === 'snapshot') {
-        const next = new Map<string, Reading>()
-        for (const r of msg.readings) next.set(r.sensor_id, r)
-        readings.value = next
-      } else if (msg.type === 'reading') {
-        const next = new Map(readings.value)
-        next.set(msg.reading.sensor_id, msg.reading)
-        readings.value = next
-      }
-    }
+  socket.onopen = () => {
+    connected.value = true
   }
 
-  onMounted(connect)
-  onUnmounted(() => {
-    stopped = true
-    if (reconnectTimer) clearTimeout(reconnectTimer)
-    if (socket) socket.close()
-  })
+  socket.onclose = () => {
+    connected.value = false
+    socket = null
+    reconnectTimer = setTimeout(connect, RECONNECT_MS)
+  }
 
+  socket.onerror = () => {
+    /* close handler will reconnect */
+  }
+
+  socket.onmessage = (event: MessageEvent<string>) => {
+    let msg: Message
+    try {
+      msg = JSON.parse(event.data) as Message
+    } catch {
+      return
+    }
+    if (msg.type === 'snapshot') {
+      const next = new Map<string, Reading>()
+      for (const r of msg.readings) next.set(r.sensor_id, r)
+      readings.value = next
+    } else if (msg.type === 'reading') {
+      const next = new Map(readings.value)
+      next.set(msg.reading.sensor_id, msg.reading)
+      readings.value = next
+    }
+  }
+}
+
+export function useReadings() {
+  if (!started) {
+    started = true
+    connect()
+  }
   return { readings, connected }
+}
+
+/** Cancel pending reconnects (for unit tests). Production never calls this. */
+export function _resetForTests(): void {
+  if (reconnectTimer) clearTimeout(reconnectTimer)
+  if (socket) socket.close()
+  started = false
+  connected.value = false
+  readings.value = new Map()
 }

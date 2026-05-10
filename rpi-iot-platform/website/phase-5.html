@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 5 &middot; Design the Dashboard &mdash; Pi IoT Academy</title>
+<meta name="description" content="Phase 5 of the Pi IoT Academy: a polished Vue touchscreen dashboard with charts, navigation, settings, and full-screen kiosk autostart.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="phase" data-phase="phase-5">
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="brand" aria-label="Pi IoT Academy home">
+      <span class="brand-logo" aria-hidden="true">Pi</span>
+      <span>
+        <span class="brand-name">Pi IoT Academy</span><br>
+        <span class="brand-sub">Phase 5 &middot; Design the Dashboard</span>
+      </span>
+    </a>
+    <nav class="topnav">
+      <a href="index.html">All phases</a>
+      <span class="progress-pill" data-progress-pill>0 / 0 done</span>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="container">
+      <p style="color: var(--text-faint); font-family: var(--font-mono); font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase; margin: 0 0 6px;">
+        Phase 05
+      </p>
+      <h1>Design the <span class="accent">dashboard</span>.</h1>
+      <p class="lede">
+        The data is flowing and the database remembers it. Now you&rsquo;ll
+        give the platform a face: a touchscreen UI built in Vue 3 with charts,
+        a sidebar, settings, and a full-screen kiosk mode that boots
+        automatically. By the end of this phase the Pi looks like a real
+        product, not a bunch of dev tools.
+      </p>
+      <div class="hero-meta">
+        <span class="tag tag-time"><span class="dot"></span>~60&ndash;90 min</span>
+        <span class="tag tag-difficulty"><span class="dot"></span>Difficulty: 2 / 3</span>
+        <span class="tag"><span class="dot"></span>Touch the screen!</span>
+        <span class="tag"><span class="dot"></span>Frontend lesson</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <div class="phase-layout">
+
+      <aside class="toc" aria-label="Steps in this phase">
+        <p class="toc-title">In this phase</p>
+        <ol>
+          <li><a href="#concept">What changed</a></li>
+          <li><a href="#step-1">1. Pull &amp; rebuild</a></li>
+          <li><a href="#step-2">2. Tour the four pages</a></li>
+          <li><a href="#step-3">3. Tap a sensor card</a></li>
+          <li><a href="#step-4">4. Read the audit log</a></li>
+          <li><a href="#step-5">5. Touch test</a></li>
+          <li><a href="#step-6">6. Kiosk mode autostart</a></li>
+          <li><a href="#step-7">7. Final verification</a></li>
+          <li><a href="#next">What&rsquo;s next</a></li>
+        </ol>
+      </aside>
+
+      <article>
+
+        <!-- CONCEPT =================================================== -->
+
+        <section id="concept" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">0</div>
+            <div class="step-title-block">
+              <h3>What changed</h3>
+              <div class="step-meta"><span>The frontend got serious.</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>Until Phase&nbsp;4 the dashboard was a single placeholder page. In Phase&nbsp;5 it becomes a four-page application:</p>
+
+            <div class="bom-grid">
+              <div class="bom-item">
+                <div class="bom-item-name">Sensors (home)</div>
+                <div class="bom-item-note">The grid you already know &mdash; now bigger, touch-friendly, and tappable for charts.</div>
+              </div>
+              <div class="bom-item">
+                <div class="bom-item-name">Modules</div>
+                <div class="bom-item-note">Where future classroom projects (Phase&nbsp;7+) will appear as tiles. Empty for now, with a preview of what&rsquo;s coming.</div>
+              </div>
+              <div class="bom-item">
+                <div class="bom-item-name">Settings</div>
+                <div class="bom-item-note">Platform info and a live feed of recent system events &mdash; reboots, retention runs, and AI errors (Phase&nbsp;6).</div>
+              </div>
+              <div class="bom-item">
+                <div class="bom-item-name">About</div>
+                <div class="bom-item-note">Stack, phase progress, credits.</div>
+              </div>
+            </div>
+
+            <p style="margin-top: 16px;">Behind the scenes, you&rsquo;re using:</p>
+            <ul>
+              <li><strong>Vue Router</strong> &mdash; client-side navigation between pages without a full reload.</li>
+              <li><strong>Chart.js</strong> &mdash; the line charts that appear when you tap a sensor card.</li>
+              <li><strong>Tailwind CSS</strong> &mdash; the design system. All colours, sizes, and spacing come from a small set of utility classes.</li>
+              <li><strong>Composables</strong> &mdash; reusable Vue functions like <code>useReadings()</code> that share the live WebSocket between every page.</li>
+            </ul>
+
+            <div class="callout info">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">Why a single-page app?</div>
+                <p>If every navigation reloaded the whole page, you&rsquo;d also drop the WebSocket every time. By doing routing in JavaScript, the connection stays open and the data keeps flowing as you move around.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 1: pull + rebuild ==================================== -->
+
+        <section id="step-1" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">1</div>
+            <div class="step-title-block">
+              <h3>Pull and rebuild</h3>
+              <div class="step-meta"><span>~10 minutes &middot; on the Pi</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>The frontend image needs to be rebuilt because we&rsquo;ve added Vue Router and Chart.js as dependencies.</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>terminal &middot; on the Pi</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>cd /opt/iot-platform
+git pull
+docker compose build frontend
+docker compose up -d</code></pre>
+            </div>
+
+            <p>Building takes a couple of minutes the first time &mdash; <code>npm install</code> downloads ~130 packages. Watch the progress with:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>terminal &middot; on the Pi</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>docker compose logs -f frontend</code></pre>
+            </div>
+
+            <p>Open <code>http://pi-iot-XX.local/</code> on your laptop. You should see the new shell &mdash; a sidebar on the left with four icons, a top bar with the connection pill, and the sensor grid in the main area.</p>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-1">
+                <span class="check-text">The new shell loads with a sidebar on the left and a connection pill in the top bar.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 2: pages ============================================= -->
+
+        <section id="step-2" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">2</div>
+            <div class="step-title-block">
+              <h3>Tour the four pages</h3>
+              <div class="step-meta"><span>~5 minutes</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>Click each icon in the sidebar in turn:</p>
+
+            <ul>
+              <li>
+                <strong><span style="font-family: var(--font-mono);">◉</span> Sensors</strong> &mdash; the home grid. Cards for every sensor that&rsquo;s ever published. Run the test publisher again if it&rsquo;s empty.
+              </li>
+              <li>
+                <strong><span style="font-family: var(--font-mono);">▦</span> Modules</strong> &mdash; placeholder tiles for the modules we haven&rsquo;t built yet. They&rsquo;re greyed out on purpose.
+              </li>
+              <li>
+                <strong><span style="font-family: var(--font-mono);">⚙</span> Settings</strong> &mdash; platform info plus a live feed of system events.
+              </li>
+              <li>
+                <strong><span style="font-family: var(--font-mono);">i</span> About</strong> &mdash; stack and phase summary.
+              </li>
+            </ul>
+
+            <p>Notice the URL changes (<code>/</code>, <code>/modules</code>, <code>/settings</code>, <code>/about</code>) but the page never fully reloads &mdash; the connection pill stays <code>connected</code> the whole time.</p>
+
+            <div class="callout info">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">Try the back button</div>
+                <p>The browser&rsquo;s back/forward buttons work as you&rsquo;d expect &mdash; Vue Router uses the standard <code>history.pushState</code> API. This is what makes a SPA feel like a real website.</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-2">
+                <span class="check-text">All four pages render and the URL changes without a full reload.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 3: tap a card ========================================= -->
+
+        <section id="step-3" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">3</div>
+            <div class="step-title-block">
+              <h3>Tap a sensor card</h3>
+              <div class="step-meta"><span>~5 minutes</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>Make sure the test publisher is running on your laptop (same command as Phase&nbsp;4). On the Sensors page, <strong>click any card</strong>.</p>
+
+            <p>A modal opens with:</p>
+            <ul>
+              <li>The sensor name and current value, big and clear.</li>
+              <li>A <strong>line chart</strong> showing the last ~100 readings, from oldest on the left to newest on the right.</li>
+              <li>The chart auto-updates as new readings arrive &mdash; you should see the right edge advance roughly every second.</li>
+            </ul>
+
+            <p>Hover anywhere on the chart line (or tap on a touchscreen) to see the exact value and timestamp at that point.</p>
+
+            <p>Close the modal by clicking the <code>×</code> button or tapping outside the box. Try a different sensor &mdash; the chart should be a different colour for humidity than for temperature.</p>
+
+            <div class="callout info">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">Where the chart data comes from</div>
+                <p>When the modal opens, the dashboard fires off <code>GET /api/sensors/&lt;id&gt;/readings?limit=100</code>. That&rsquo;s the same endpoint you tried with <code>curl</code> in Phase&nbsp;4 &mdash; you&rsquo;re reusing the work.</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-3">
+                <span class="check-text">Tapping a card opens a chart that updates live.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 4: settings + audit log ============================== -->
+
+        <section id="step-4" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">4</div>
+            <div class="step-title-block">
+              <h3>Read the audit log</h3>
+              <div class="step-meta"><span>~5 minutes</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>Go to <strong>Settings</strong>. Below the platform info you&rsquo;ll see a <em>Recent events</em> section listing the latest 50 rows from <code>system_logs</code>.</p>
+
+            <p>You should see at least one <code>boot</code> event from the last time the API started. Click <strong>Refresh</strong> to reload the list. If the API has been up since 03:00 UTC, you&rsquo;ll also see a <code>reading_retention.run</code> event &mdash; that&rsquo;s the nightly clean-up.</p>
+
+            <p>Try this: SSH into the Pi and restart the API:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>terminal &middot; on the Pi</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>docker compose restart api</code></pre>
+            </div>
+
+            <p>Wait 5 seconds, then click <strong>Refresh</strong> on the Settings page. A new <code>boot</code> event should appear at the top of the list with the current timestamp.</p>
+
+            <div class="callout info">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">Why this matters</div>
+                <p>In a real lab, you&rsquo;ll want to know <em>why</em> something happened. The audit log gives a per-event trail: when did the platform restart, when did retention last run, when did an AI call fail. Operators love this stuff.</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-4">
+                <span class="check-text">Settings page lists system events, and a fresh <code>boot</code> event appears after restarting the API.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 5: touch test ======================================== -->
+
+        <section id="step-5" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">5</div>
+            <div class="step-title-block">
+              <h3>Touch test</h3>
+              <div class="step-meta"><span>~5 minutes &middot; on the Pi&rsquo;s touchscreen</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>The dashboard is meant to be used with fingers, not just a mouse. Open Chromium on the Pi&rsquo;s 5″ touchscreen and visit:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>browser &middot; on the Pi</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>http://localhost/</code></pre>
+            </div>
+
+            <p>Run through these checks with your fingertip:</p>
+
+            <ul>
+              <li>Each sidebar icon is at least 48×48 pixels &mdash; you can hit it accurately on the first try.</li>
+              <li>Sensor cards are big enough to read from across the room &mdash; the value uses an extra-large font.</li>
+              <li>Tapping a card opens the modal smoothly. Tapping outside the modal or the close button dismisses it.</li>
+              <li>The Settings <strong>Refresh</strong> button is easy to hit and gives visible feedback when you press it.</li>
+              <li>Nothing depends on hovering the mouse &mdash; touch screens have no hover.</li>
+            </ul>
+
+            <div class="callout warn">
+              <div class="callout-icon" aria-hidden="true">!</div>
+              <div class="callout-body">
+                <div class="callout-title">If a button feels too small</div>
+                <p>That&rsquo;s a real bug. Touch targets below ~44 px are awkward even for adult fingers, terrible for primary-school students. Tell your teacher what you found &mdash; we&rsquo;ll fix it.</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-5">
+                <span class="check-text">Every interactive element on the dashboard is comfortably tappable on the touchscreen.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 6: kiosk ============================================= -->
+
+        <section id="step-6" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">6</div>
+            <div class="step-title-block">
+              <h3>Kiosk mode autostart</h3>
+              <div class="step-meta"><span>~10 minutes &middot; on the Pi</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>The final touch: the Pi should boot straight into the dashboard, full-screen, with no browser chrome or desktop visible. That&rsquo;s called <strong>kiosk mode</strong>.</p>
+
+            <p>The repo has a script that sets it up:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>terminal &middot; on the Pi</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>cd /opt/iot-platform
+./scripts/setup-kiosk.sh</code></pre>
+            </div>
+
+            <p>The script:</p>
+            <ol>
+              <li>Installs Chromium if it&rsquo;s missing.</li>
+              <li>Writes a desktop autostart entry to <code>~/.config/autostart/iot-dashboard.desktop</code>.</li>
+              <li>Configures Chromium to launch full-screen pointing at <code>http://localhost</code>.</li>
+            </ol>
+
+            <p>To test, reboot the Pi:</p>
+
+            <div class="code-block">
+              <div class="code-block-header"><span>terminal &middot; on the Pi</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>sudo reboot</code></pre>
+            </div>
+
+            <p>After about a minute, the touchscreen should come up showing the dashboard full-screen &mdash; no taskbar, no address bar, just sensors.</p>
+
+            <div class="callout info">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">Escape hatch</div>
+                <p>Need to get out of kiosk mode (e.g. to update software)? Press <code>Alt+F4</code> on a USB keyboard to quit Chromium. The desktop comes back. To go back into kiosk mode, just relaunch Chromium or reboot.</p>
+              </div>
+            </div>
+
+            <div class="callout warn">
+              <div class="callout-icon" aria-hidden="true">!</div>
+              <div class="callout-body">
+                <div class="callout-title">If the dashboard doesn&rsquo;t auto-launch</div>
+                <p>Different Pi OS versions use different desktop environments. Check that <code>~/.config/autostart/iot-dashboard.desktop</code> exists. If it does and Chromium still doesn&rsquo;t launch, try the older path <code>~/.config/lxsession/LXDE-pi/autostart</code> &mdash; ask your teacher for the exact lines to add.</p>
+              </div>
+            </div>
+
+            <div class="checkpoint">
+              <div class="checkpoint-label">Checkpoint</div>
+              <label>
+                <input type="checkbox" data-key="step-6">
+                <span class="check-text">After a reboot, the touchscreen comes up directly into the full-screen dashboard.</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 7: final ============================================== -->
+
+        <section id="step-7" class="step">
+          <div class="step-head">
+            <div class="step-num" aria-hidden="true">7</div>
+            <div class="step-title-block">
+              <h3>Final verification</h3>
+              <div class="step-meta"><span>5 minutes</span></div>
+            </div>
+          </div>
+          <div class="step-body">
+            <p>The platform should now look and feel like a real classroom IoT terminal. Tick everything below before declaring Phase&nbsp;5 done.</p>
+
+            <div class="final-checklist">
+              <h3>Phase 5 sign-off</h3>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-1">
+                  <span class="check-text">All four pages (Sensors, Modules, Settings, About) render with no errors.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-2">
+                  <span class="check-text">Connection pill stays <code>connected</code> while you click between pages.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-3">
+                  <span class="check-text">Tapping a sensor card opens a live, auto-updating chart.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-4">
+                  <span class="check-text">Settings page shows recent <code>system_logs</code> events; a restart of the API adds a new <code>boot</code> entry.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-5">
+                  <span class="check-text">Every interactive element is at least 48&nbsp;px tall and reachable by touch.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-6">
+                  <span class="check-text">A clean reboot brings up Chromium full-screen on the dashboard.</span>
+                </label>
+              </div>
+              <div class="checkpoint">
+                <label>
+                  <input type="checkbox" data-key="verify-7">
+                  <span class="check-text">A class of 25 standing 1.5&nbsp;m away can read the value on a sensor card.</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- NEXT ====================================================== -->
+
+        <section id="next" class="next-up">
+          <h3>Phase 5 complete?</h3>
+          <p>You&rsquo;ve built a real product. Sensors, charts, settings, kiosk &mdash; the lot. Next phase: that big empty &ldquo;Explain&rdquo; spot we&rsquo;re going to add to each card. Time to introduce Claude.</p>
+          <a href="index.html" class="btn disabled" data-require-all-checked aria-disabled="true">Phase 6: Ask Claude &nbsp;&rarr;</a>
+          <p style="margin-top: 14px; color: var(--text-faint); font-size: 0.88rem;">
+            (The button unlocks when every box above is ticked.)
+          </p>
+        </section>
+
+      </article>
+
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <span>&copy; Coderra.je &middot; Designed for Haute Vall&eacute;e School</span>
+    <span>Phase 5 of 7 &middot; Pi IoT Academy</span>
+  </div>
+</footer>
+
+<script src="js/main.js" defer></script>
+</body>
+</html>
