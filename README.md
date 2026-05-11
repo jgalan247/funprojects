@@ -34,6 +34,34 @@ When all five containers report healthy:
 | `http://<pi>:8001/health`          | AI service health check |
 | `mqtt://<pi>:1883` (auth required) | Mosquitto MQTT broker |
 
+## Cloning for classroom kits
+
+Once one Pi works end-to-end, you can clone its SD card to set up the rest
+of the kits in minutes instead of repeating Phase 1 on every Pi.
+
+1. **Image the working SD card** to a `.img` file (Raspberry Pi Imager →
+   Read, or `dd if=/dev/sdX of=pi-iot-master.img bs=4M status=progress`).
+   Optionally shrink it first with [PiShrink](https://github.com/Drewsif/PiShrink).
+2. **Flash the image** to each new SD card with Raspberry Pi Imager.
+3. **First boot per Pi:** SSH in and run the post-clone helper:
+
+```bash
+cd /opt/iot-platform
+sudo ./scripts/post-clone.sh
+```
+
+It will:
+
+- Prompt for a unique hostname (e.g. `pi-iot-02`).
+- Regenerate the SSH host keys so your laptop doesn't refuse to connect
+  to multiple Pis with identical fingerprints.
+- Optionally wipe `data/` so the new Pi starts with a fresh database
+  and no leftover snapshots from the master.
+- Offer to reboot.
+
+After that, each Pi is unique on the network but otherwise identical to the
+master — same code, same `.env`, same MQTT credentials.
+
 ## Goals
 
 - A single reusable platform, not a collection of one-off projects.
