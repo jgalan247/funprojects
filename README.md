@@ -10,8 +10,9 @@ website](website/index.html). For anyone who just wants the commands:
 
 ```bash
 # On a fresh Pi with Raspberry Pi OS 64-bit:
+sudo mkdir -p /opt/iot-platform && sudo chown $USER:$USER /opt/iot-platform
 cd /opt/iot-platform
-git clone <this repo> .
+git clone https://github.com/Computing-Hub/IoT_Master.git .
 ./scripts/bootstrap-pi.sh        # installs Docker, adds user to docker group
 # (log out + back in for the group change)
 

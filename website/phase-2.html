@@ -193,14 +193,6 @@ docker compose version</code></pre>
           <div class="step-body">
             <p>The platform code lives in a Git repository. <strong>Git</strong> is a tool for tracking and sharing files. We&rsquo;ll <em>clone</em> the repo &mdash; copy it from the internet to your Pi.</p>
 
-            <div class="callout teacher">
-              <div class="callout-icon" aria-hidden="true">T</div>
-              <div class="callout-body">
-                <div class="callout-title">Your teacher will give you</div>
-                <p>The repository URL. Replace <code>&lt;REPO_URL&gt;</code> in the commands below with the one on the board.</p>
-              </div>
-            </div>
-
             <p>Move into the folder you set up in Phase 1, then clone:</p>
 
             <div class="code-block">
@@ -209,8 +201,16 @@ docker compose version</code></pre>
                 <button class="copy-btn" type="button">Copy</button>
               </div>
               <pre><code>cd /opt/iot-platform
-git clone &lt;REPO_URL&gt; .
+git clone https://github.com/Computing-Hub/IoT_Master.git .
 ls</code></pre>
+            </div>
+
+            <div class="callout info">
+              <div class="callout-icon" aria-hidden="true">i</div>
+              <div class="callout-body">
+                <div class="callout-title">Using a fork?</div>
+                <p>If your class has its own fork (so each year-group can save changes), replace the URL above with your teacher&rsquo;s fork URL. The structure is identical.</p>
+              </div>
             </div>
 
             <p>The dot at the end of <code>git clone</code> means &ldquo;clone into the current folder&rdquo;. The <code>ls</code> at the end shows you what arrived. You should see at least:</p>
