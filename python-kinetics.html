@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hands-On Python — Kinesthetic Coding Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  /* Page-specific components for the kinesthetic guide */
+  .meta-row{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 6px;}
+
+  .kit{
+    background:rgba(79,195,247,0.06);
+    border:1px solid rgba(79,195,247,0.22);
+    border-radius:14px;padding:14px 16px;margin:16px 0;
+  }
+  .kit-title{
+    font-weight:800;color:var(--blue);font-size:0.76rem;
+    text-transform:uppercase;letter-spacing:0.11em;margin-bottom:10px;
+    display:flex;align-items:center;gap:6px;
+  }
+  .kit ul{
+    list-style:none;display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:6px 18px;
+  }
+  .kit li{font-size:0.84rem;color:var(--dim);display:flex;gap:8px;align-items:flex-start;line-height:1.5;}
+  .kit li::before{content:'▪';color:var(--blue);flex-shrink:0;}
+
+  .pycode{
+    background:rgba(0,0,0,0.34);
+    border:1px solid rgba(0,212,170,0.18);
+    border-radius:12px;
+    padding:14px 16px;margin:12px 0;
+    font-family:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;
+    font-size:0.82rem;line-height:1.75;color:#cfe9e2;
+    overflow-x:auto;white-space:pre;
+  }
+  .pycode .c{color:rgba(232,248,255,0.38);font-style:italic;}
+  .pycode .k{color:var(--orange);font-weight:700;}
+  .pycode .s{color:var(--green);}
+  .pycode .n{color:var(--yellow);}
+  .pycode .b{color:var(--blue);}
+  .code-label{
+    font-size:0.62rem;font-weight:800;text-transform:uppercase;
+    letter-spacing:0.12em;color:rgba(0,212,170,0.6);
+    margin:18px 0 -4px;
+  }
+
+  .role-card{
+    background:rgba(165,94,234,0.07);
+    border:1px solid rgba(165,94,234,0.28);
+    border-radius:12px;padding:13px 16px;
+  }
+  .role-card .rc-who{font-weight:800;color:var(--purple);font-size:0.82rem;margin-bottom:4px;}
+  .role-card .rc-does{font-size:0.82rem;color:var(--dim);line-height:1.6;}
+</style>
+</head>
+<body>
+<div class="seabed"></div>
+
+<!-- SCHOOL BADGE -->
+<div class="school-badge">
+  <span class="sb-icon">🏫</span>
+  <div class="sb-text">
+    <span class="sb-name">Haute Vallée School</span>
+    <span class="sb-sub">Computer Science</span>
+  </div>
+</div>
+
+<div class="bubbles">
+  <div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div>
+  <div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div>
+  <div class="b"></div><div class="b"></div>
+</div>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-tag">Teacher's Guide · Kinesthetic Learning · 6 Unplugged Activities</div>
+  <span class="hero-shark">🧱</span>
+  <h1>Hands-On <span style="color:var(--accent)">Python</span></h1>
+  <p class="hero-desc">Teach the core ideas of Python with LEGO bricks, paper cups, dice and movement — <strong>before</strong> anyone touches a keyboard. Every activity ends with a "bridge to code" so students see the real Python their hands just acted out.</p>
+  <div class="hero-pills">
+    <span class="pill">🤚 Learn by Doing</span>
+    <span class="pill">🧩 6 Core Concepts</span>
+    <span class="pill">💻 No Computers Needed</span>
+    <span class="pill">👥 Pairs &amp; Small Groups</span>
+    <span class="pill">⏱️ ~50 min Each</span>
+  </div>
+</header>
+
+<!-- CLASSROOM KIT DASHBOARD -->
+<section class="var-dashboard">
+  <div class="var-title">🎒 Your Classroom Kit</div>
+  <div class="var-grid">
+    <div class="var-card vc-lives">
+      <div class="var-card-icon">🧱</div>
+      <div class="var-card-name">Material</div>
+      <div class="var-card-type">LEGO Bricks</div>
+      <div class="var-card-desc">Mixed colours. The workhorse — used as values, list items and loop bodies.</div>
+    </div>
+    <div class="var-card vc-level">
+      <div class="var-card-icon">🥤</div>
+      <div class="var-card-name">Material</div>
+      <div class="var-card-type">Paper Cups</div>
+      <div class="var-card-desc">One per student pair. These become variables — labelled containers that hold a value.</div>
+    </div>
+    <div class="var-card vc-score">
+      <div class="var-card-icon">🏷️</div>
+      <div class="var-card-name">Material</div>
+      <div class="var-card-type">Sticky Notes</div>
+      <div class="var-card-desc">For labelling cups and bricks. A label is a variable <em>name</em>.</div>
+    </div>
+    <div class="var-card vc-speed">
+      <div class="var-card-icon">📏</div>
+      <div class="var-card-name">Material</div>
+      <div class="var-card-type">Masking Tape</div>
+      <div class="var-card-desc">Mark the "decision floor" and the list index numbers on a table or carpet.</div>
+    </div>
+    <div class="var-card vc-poison">
+      <div class="var-card-icon">🎲</div>
+      <div class="var-card-name">Material</div>
+      <div class="var-card-type">Dice</div>
+      <div class="var-card-desc">Generates the changing condition for the conditionals activity.</div>
+    </div>
+    <div class="var-card vc-hiscore">
+      <div class="var-card-icon">🗂️</div>
+      <div class="var-card-name">Material</div>
+      <div class="var-card-type">Index Cards</div>
+      <div class="var-card-desc">Write one instruction per card — students physically re-order them into a program.</div>
+    </div>
+    <div class="var-card vc-health">
+      <div class="var-card-icon">🟩</div>
+      <div class="var-card-name">Material</div>
+      <div class="var-card-type">Baseplate</div>
+      <div class="var-card-desc">A flat LEGO board — the "output" surface where built programs come to life.</div>
+    </div>
+    <div class="var-card vc-timer">
+      <div class="var-card-icon">🧍</div>
+      <div class="var-card-name">Material</div>
+      <div class="var-card-type">Floor Space</div>
+      <div class="var-card-desc">Room to walk a loop and follow a branch. The body itself becomes the computer.</div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY KINESTHETIC -->
+<section class="var-dashboard" style="margin-top:8px;">
+  <div class="var-title">🧠 Why Hands First?</div>
+  <div class="two-col">
+    <div class="concept">
+      <div class="concept-title">The idea is the hard part — not the syntax</div>
+      <p>Beginners stall on Python because abstract ideas (a variable, a loop, a function) have nothing to grab onto. If a student has already <em>physically been</em> a loop — walked it, felt it repeat — the keyword <code>for</code> is just a label for something they already understand.</p>
+    </div>
+    <div class="concept">
+      <div class="concept-title">Every activity ends at real code</div>
+      <p>This is not "computing without computers" for its own sake. Each lesson finishes with a <strong>Bridge to Python</strong>: the exact code that matches what their hands just did. Move to the keyboard the moment the concept has landed.</p>
+    </div>
+  </div>
+  <div class="info">Run the lessons in order — each one reuses the physical "vocabulary" of the last. By Lesson 6 a function is simply "a machine that does a sequence, with cups for inputs and a loop inside".</div>
+</section>
+
+<!-- PROGRESS NAV -->
+<nav class="progress-nav">
+  <div class="progress-inner">
+    <div class="pstep" onclick="go(1)"><div class="pdot">1</div><div class="plabel">Sequencing</div></div>
+    <div class="pline"></div>
+    <div class="pstep" onclick="go(2)"><div class="pdot">2</div><div class="plabel">Variables</div></div>
+    <div class="pline"></div>
+    <div class="pstep" onclick="go(3)"><div class="pdot">3</div><div class="plabel">Lists</div></div>
+    <div class="pline"></div>
+    <div class="pstep" onclick="go(4)"><div class="pdot">4</div><div class="plabel">Loops</div></div>
+    <div class="pline"></div>
+    <div class="pstep" onclick="go(5)"><div class="pdot">5</div><div class="plabel">Conditionals</div></div>
+    <div class="pline"></div>
+    <div class="pstep" onclick="go(6)"><div class="pdot">6</div><div class="plabel">Functions</div></div>
+  </div>
+</nav>
+
+<main class="container">
+
+<!-- ╔══════════════════════════════════╗ -->
+<!-- ║         LESSON  1               ║ -->
+<!-- ╚══════════════════════════════════╝ -->
+<article class="lesson l1" id="l1">
+  <div class="lesson-hdr" onclick="go(1)">
+    <div class="lnum">01</div>
+    <div class="ltxt">
+      <div class="ltag">Lesson 1 · Sequencing &amp; Algorithms</div>
+      <div class="ltitle">Be the Robot 🤖</div>
+      <div class="lsub">Step-by-step instructions · Order matters · Algorithms · The first Python program</div>
+    </div>
+    <div class="lemoji">🤖</div>
+    <div class="lchev">▼</div>
+  </div>
+  <div class="lbody">
+    <div class="obj">
+      <strong>By the end of Lesson 1</strong> students will understand that a program is an <strong>ordered sequence of instructions</strong>, that a computer follows them <em>literally</em>, and that changing the order changes the result. They'll write and read their first lines of Python.
+    </div>
+
+    <div class="meta-row">
+      <span class="pill">⏱️ 50 min</span>
+      <span class="pill">👥 Pairs</span>
+      <span class="pill">🧱 LEGO + index cards</span>
+    </div>
+
+    <div class="kit">
+      <div class="kit-title">🎒 Kit for this lesson</div>
+      <ul>
+        <li>6–8 LEGO bricks per pair</li>
+        <li>1 baseplate per pair</li>
+        <li>Blank index cards</li>
+        <li>A pen each</li>
+      </ul>
+    </div>
+
+    <div class="slabel">Part 1 — The Build, No Talking</div>
+    <ul class="steps">
+      <li><div class="sc"><strong>One partner builds in secret</strong><span>Behind a book or bag, Partner A builds a small 4–6 brick model on their baseplate. Nobody else sees it.</span></div></li>
+      <li><div class="sc"><strong>Write the instructions on cards</strong><span>Partner A writes <em>one instruction per index card</em> to recreate the model — e.g. "Place the red 2×4 brick flat in the bottom-left corner". One action per card, no diagrams.</span></div></li>
+      <li><div class="sc"><strong>Partner B becomes the robot</strong><span>Partner B takes the cards <em>in the given order</em> and follows each one <strong>exactly</strong> — no guessing, no improving. A robot does only what it is told.</span></div></li>
+      <li><div class="sc"><strong>Compare</strong><span>Reveal both models. Where they differ, the <em>instruction</em> was unclear or in the wrong place — not the robot's fault. This is debugging.</span></div></li>
+    </ul>
+
+    <div class="concept">
+      <div class="concept-title">🧠 Key Concept: An algorithm is an ordered list of steps</div>
+      <p>A program runs <strong>top to bottom, one line at a time</strong>. The computer never skips ahead and never fills in gaps. The stack of cards <em>is</em> a program — and the order of the cards is the program's logic.</p>
+    </div>
+
+    <div class="slabel">Part 2 — Order Matters</div>
+    <ul class="steps">
+      <li><div class="sc"><strong>Shuffle two cards</strong><span>Swap the order of any two instruction cards and run the robot again. Watch the build break — "put the roof on" before "build the walls" simply cannot work.</span></div></li>
+      <li><div class="sc"><strong>Find the smallest fix</strong><span>Challenge the pair to fix the build by moving just one card. This is their first taste of <em>reordering code to fix a bug</em>.</span></div></li>
+    </ul>
+    <div class="tip">Keep a "robot rule" poster up all year: <strong>The robot does exactly what the card says, in the order the cards are in.</strong> You'll point at it constantly.</div>
+
+    <div class="slabel">🌉 Bridge to Python</div>
+    <p style="color:var(--dim);font-size:0.88rem;line-height:1.7;margin-bottom:6px;">Each index card is one line of code. Reading top to bottom is exactly how Python runs a file.</p>
+    <div class="pycode"><span class="c"># A program is a sequence — steps run top to bottom, in order.</span>
+<span class="b">print</span>(<span class="s">"Place the red brick"</span>)
+<span class="b">print</span>(<span class="s">"Place the blue brick on top"</span>)
+<span class="b">print</span>(<span class="s">"Place the green brick on top"</span>)
+<span class="b">print</span>(<span class="s">"Tower built!"</span>)</div>
+    <div class="info">Swap two <code>print</code> lines and run it — the output order changes, just like the shuffled cards. The computer never objects; it just obeys.</div>
+
+    <div class="chal">
+      <div class="chal-title">🔥 Extension Challenge</div>
+      <p>Give a pair a stack of cards with one <strong>bug card</strong> hidden inside (e.g. a step that's impossible or out of place). Can they act as robot, spot exactly which line fails, and rewrite that one card? That's debugging — and it's a skill, not a punishment.</p>
+    </div>
+
+    <div class="slabel">✅ Lesson 1 Checklist</div>
+    <ul class="checklist">
+      <li>Each pair built a model from written instructions alone</li>
+      <li>Students saw a build break when two steps were swapped</li>
+      <li>The class can state the "robot rule" in their own words</li>
+      <li>Everyone has read (and ideally typed) a 3–4 line Python program</li>
+      <li>Students can explain: what an algorithm is, and why order matters</li>
+    </ul>
+  </div>
+</article>
+
+<!-- ╔══════════════════════════════════╗ -->
+<!-- ║         LESSON  2               ║ -->
+<!-- ╚══════════════════════════════════╝ -->
+<article class="lesson l2" id="l2">
+  <div class="lesson-hdr" onclick="go(2)">
+    <div class="lnum">02</div>
+    <div class="ltxt">
+      <div class="ltag">Lesson 2 · Variables &amp; Assignment</div>
+      <div class="ltitle">The Labelled Cup 🥤</div>
+      <div class="lsub">Named containers · Assignment · Reassignment · Data types</div>
+    </div>
+    <div class="lemoji">🥤</div>
+    <div class="lchev">▼</div>
+  </div>
+  <div class="lbody">
+    <div class="obj">
+      <strong>By the end of Lesson 2</strong> students will understand a variable as a <strong>labelled container that holds one value at a time</strong>, that assigning a new value <em>replaces</em> the old one, and that values have different <strong>types</strong> (numbers, words, true/false).
+    </div>
+
+    <div class="meta-row">
+      <span class="pill">⏱️ 50 min</span>
+      <span class="pill">👥 Pairs</span>
+      <span class="pill">🥤 Cups + sticky notes + bricks</span>
+    </div>
+
+    <div class="kit">
+      <div class="kit-title">🎒 Kit for this lesson</div>
+      <ul>
+        <li>3 paper cups per pair</li>
+        <li>Sticky notes for labels</li>
+        <li>LEGO bricks (the "values")</li>
+        <li>A few small slips of paper for words</li>
+      </ul>
+    </div>
+
+    <div class="slabel">Part 1 — Make a Variable</div>
+    <ul class="steps">
+      <li><div class="sc"><strong>Label a cup</strong><span>Students stick a label on a cup that reads <code>score</code>. The label is the variable's <em>name</em>; the cup is the storage.</span></div></li>
+      <li><div class="sc"><strong>Put a value in</strong><span>Drop a brick with "0" written on it into the <code>score</code> cup. The cup now <em>holds</em> the value 0.</span></div></li>
+      <li><div class="sc"><strong>Make two more</strong><span>Label a second cup <code>lives</code> and put a "3" brick in it. Label a third cup <code>player</code> and put a paper slip reading "Sam" in it.</span></div></li>
+    </ul>
+
+    <div class="concept">
+      <div class="concept-title">🧠 Key Concept: name = value</div>
+      <p>A variable has two parts: a <strong>name</strong> (the label) and a <strong>value</strong> (what's inside). In Python the <code>=</code> sign means "put this value into this cup" — it is <em>not</em> the equals from maths.</p>
+    </div>
+
+    <div class="slabel">Part 2 — Reassignment</div>
+    <ul class="steps">
+      <li><div class="sc"><strong>Score a point</strong><span>Tell students: "the player caught a fish — score is now 10". They must <em>take the 0 brick out</em> and put a "10" brick in. A cup holds only one value at a time.</span></div></li>
+      <li><div class="sc"><strong>Where did the 0 go?</strong><span>Ask the class. The old value is gone — overwritten. This is the single most important idea in the lesson.</span></div></li>
+      <li><div class="sc"><strong>Change a life</strong><span>"The player got hit." Swap the "3" brick in <code>lives</code> for a "2". Same cup, same label, new value.</span></div></li>
+    </ul>
+    <div class="warn">Watch for the maths misconception: students think <code>score = 10</code> is a fact that's "true forever". Keep physically emptying the cup — the value is whatever is in there <em>right now</em>.</div>
+
+    <div class="slabel">Part 3 — Types of Value</div>
+    <p style="color:var(--dim);font-size:0.88rem;line-height:1.7;margin-bottom:8px;">Sort the cup contents into kinds: number bricks (you can add them), word slips (you can't add them), and a "true/false" coin. These are Python's <strong>data types</strong>: <code>int</code>, <code>str</code>, <code>bool</code>.</p>
+
+    <div class="slabel">🌉 Bridge to Python</div>
+    <div class="pycode"><span class="c"># Each line: put a value into a labelled cup.</span>
+score  = <span class="n">0</span>          <span class="c"># a number (int)</span>
+score  = <span class="n">10</span>         <span class="c"># the old 0 is gone — replaced</span>
+lives  = <span class="n">3</span>
+player = <span class="s">"Sam"</span>      <span class="c"># a word (str)</span>
+
+<span class="b">print</span>(player, <span class="s">"has"</span>, score, <span class="s">"points and"</span>, lives, <span class="s">"lives"</span>)</div>
+    <div class="info">Run it, then add the line <code>score = score + 5</code>. Read it as: "take what's in the score cup, add 5, put the result back in the score cup." Have students mime it with the brick.</div>
+
+    <div class="chal">
+      <div class="chal-title">🔥 Extension Challenge</div>
+      <p>The classic swap puzzle, with cups. Give pairs a <code>left</code> cup and a <code>right</code> cup with different bricks. Challenge: get them to swap contents. They'll discover they need a third empty cup — <code>temp</code>. That's a real technique professional programmers use.</p>
+    </div>
+
+    <div class="slabel">✅ Lesson 2 Checklist</div>
+    <ul class="checklist">
+      <li>Each pair built and labelled three variable cups</li>
+      <li>Students physically reassigned a variable and saw the old value disappear</li>
+      <li>The class can explain why <code>=</code> is not the maths "equals"</li>
+      <li>Students sorted values into number / word / true-false types</li>
+      <li>Everyone has typed a Python program that creates and updates variables</li>
+    </ul>
+  </div>
+</article>
+
+<!-- ╔══════════════════════════════════╗ -->
+<!-- ║         LESSON  3               ║ -->
+<!-- ╚══════════════════════════════════╝ -->
+<article class="lesson l3" id="l3">
+  <div class="lesson-hdr" onclick="go(3)">
+    <div class="lnum">03</div>
+    <div class="ltxt">
+      <div class="ltag">Lesson 3 · Lists &amp; Indexing</div>
+      <div class="ltitle">The LEGO Brick Train 🚂</div>
+      <div class="lsub">Ordered collections · Index starts at 0 · Append &amp; remove · Length</div>
+    </div>
+    <div class="lemoji">🚂</div>
+    <div class="lchev">▼</div>
+  </div>
+  <div class="lbody">
+    <div class="obj">
+      <strong>By the end of Lesson 3</strong> students will understand a list as an <strong>ordered collection of values</strong>, that each item has a numbered <strong>position (index) starting at 0</strong>, and that lists can grow and shrink.
+    </div>
+
+    <div class="meta-row">
+      <span class="pill">⏱️ 50 min</span>
+      <span class="pill">👥 Pairs</span>
+      <span class="pill">🧱 Bricks + masking tape</span>
+    </div>
+
+    <div class="kit">
+      <div class="kit-title">🎒 Kit for this lesson</div>
+      <ul>
+        <li>6+ LEGO bricks of different colours per pair</li>
+        <li>Masking tape to mark index numbers</li>
+        <li>A long strip of desk or floor</li>
+      </ul>
+    </div>
+
+    <div class="slabel">Part 1 — Build the Train</div>
+    <ul class="steps">
+      <li><div class="sc"><strong>Lay the track</strong><span>Each pair puts down a strip of masking tape and writes index numbers along it: <strong>0, 1, 2, 3, 4…</strong> Start at 0 — this is non-negotiable and the whole point.</span></div></li>
+      <li><div class="sc"><strong>Park the bricks</strong><span>Place 4 coloured bricks on positions 0–3. This is the list <code>train = ["red", "blue", "green", "yellow"]</code>.</span></div></li>
+      <li><div class="sc"><strong>Fetch by index</strong><span>Call out an index — "give me index 2!" — students physically pick up the brick at position 2. Repeat fast, like a game.</span></div></li>
+    </ul>
+
+    <div class="concept">
+      <div class="concept-title">🧠 Key Concept: Index starts at 0</div>
+      <p>The first item is at index <strong>0</strong>, not 1. The brick at index 2 is the <em>third</em> brick. This trips up everyone at first — which is exactly why we tape the numbers down and point at them.</p>
+    </div>
+
+    <div class="slabel">Part 2 — Grow and Shrink</div>
+    <ul class="steps">
+      <li><div class="sc"><strong>Append</strong><span>"Add an orange brick to the end." Students place it at the next free index. The list got longer — that's <code>.append()</code>.</span></div></li>
+      <li><div class="sc"><strong>Remove</strong><span>"Take out the blue brick." Remove it — and notice everything after it shuffles down a position. Indexes are not permanent name tags; they are <em>current positions</em>.</span></div></li>
+      <li><div class="sc"><strong>Count</strong><span>"How long is the train?" They count the bricks. That's <code>len(train)</code>.</span></div></li>
+    </ul>
+    <div class="tip">When a brick is removed and the rest shuffle down, that's the best moment of the lesson. Pause on it. "Index 3 used to be yellow — what is it now?"</div>
+
+    <div class="slabel">🌉 Bridge to Python</div>
+    <div class="pycode"><span class="c"># The train of bricks, written as a Python list.</span>
+train = [<span class="s">"red"</span>, <span class="s">"blue"</span>, <span class="s">"green"</span>, <span class="s">"yellow"</span>]
+
+<span class="b">print</span>(train[<span class="n">0</span>])        <span class="c"># first brick  -> red</span>
+<span class="b">print</span>(train[<span class="n">2</span>])        <span class="c"># third brick  -> green</span>
+
+train.<span class="b">append</span>(<span class="s">"orange"</span>)  <span class="c"># add a brick to the end</span>
+<span class="b">print</span>(<span class="b">len</span>(train))     <span class="c"># how many bricks -> 5</span></div>
+    <div class="info">Ask for <code>train[10]</code> on the real train — there's no brick there. Run it in Python: <code>IndexError</code>. The error message is the computer saying "there's nothing at that position."</div>
+
+    <div class="chal">
+      <div class="chal-title">🔥 Extension Challenge</div>
+      <p>Give a pair a target pattern (e.g. red-red-blue-green) and a scrambled train. They must reach the target using only "swap index A and index B" moves, said out loud before each swap. They're now writing list-manipulation algorithms — and they'll meet sorting later.</p>
+    </div>
+
+    <div class="slabel">✅ Lesson 3 Checklist</div>
+    <ul class="checklist">
+      <li>Each pair built an indexed brick train starting at position 0</li>
+      <li>Students can fetch the correct brick when given an index</li>
+      <li>The class saw indexes shift when an item was removed</li>
+      <li>Students used append and len on their physical train</li>
+      <li>Everyone has typed Python that indexes and grows a list</li>
+    </ul>
+  </div>
+</article>
+
+<!-- ╔══════════════════════════════════╗ -->
+<!-- ║         LESSON  4               ║ -->
+<!-- ╚══════════════════════════════════╝ -->
+<article class="lesson l4" id="l4">
+  <div class="lesson-hdr" onclick="go(4)">
+    <div class="lnum">04</div>
+    <div class="ltxt">
+      <div class="ltag">Lesson 4 · Loops &amp; Repetition</div>
+      <div class="ltitle">Walk the Loop 🔁</div>
+      <div class="lsub">for loops · while loops · The loop body · Indentation = "inside the box"</div>
+    </div>
+    <div class="lemoji">🔁</div>
+    <div class="lchev">▼</div>
+  </div>
+  <div class="lbody">
+    <div class="obj">
+      <strong>By the end of Lesson 4</strong> students will understand a loop as <strong>repeating a set of actions</strong>, the difference between repeating <em>for each item</em> (<code>for</code>) and repeating <em>until something changes</em> (<code>while</code>), and that the indented <strong>body</strong> is what gets repeated.
+    </div>
+
+    <div class="meta-row">
+      <span class="pill">⏱️ 50 min</span>
+      <span class="pill">👥 Small groups</span>
+      <span class="pill">🧍 Floor space + brick train</span>
+    </div>
+
+    <div class="kit">
+      <div class="kit-title">🎒 Kit for this lesson</div>
+      <ul>
+        <li>The brick train from Lesson 3</li>
+        <li>Open floor space</li>
+        <li>Masking tape to mark a walking circuit</li>
+        <li>A baseplate as the "build target"</li>
+      </ul>
+    </div>
+
+    <div class="slabel">Part 1 — The for Loop: Once Per Brick</div>
+    <ul class="steps">
+      <li><div class="sc"><strong>Line up the train</strong><span>Put the brick train on the table. The instruction is: <em>"for each brick in the train, place a matching brick on the baseplate."</em></span></div></li>
+      <li><div class="sc"><strong>Walk it</strong><span>A student touches brick 0, does the action, moves to brick 1, does the action… The loop runs <strong>exactly once per item</strong> and then stops on its own. No item left = loop over.</span></div></li>
+      <li><div class="sc"><strong>Name the parts</strong><span>The thing being walked is the list. The current brick is the <strong>loop variable</strong>. The action performed is the <strong>loop body</strong>.</span></div></li>
+    </ul>
+
+    <div class="slabel">Part 2 — The while Loop: Until It Changes</div>
+    <ul class="steps">
+      <li><div class="sc"><strong>Tape a circuit</strong><span>Mark a small walking loop on the floor. The rule: <em>"while you have taken fewer than 5 steps, take another step."</em></span></div></li>
+      <li><div class="sc"><strong>Walk and check</strong><span>Before <em>every</em> step the student says the count and checks the condition out loud: "2 steps, fewer than 5? Yes — step again." When the check fails, they stop.</span></div></li>
+      <li><div class="sc"><strong>Break it on purpose</strong><span>Remove the "+1 step" — now the count never changes, the check is always true, and the student would walk forever. That's an <strong>infinite loop</strong>, felt in the legs.</span></div></li>
+    </ul>
+
+    <div class="concept">
+      <div class="concept-title">🧠 Key Concept: Indentation is "inside the loop"</div>
+      <p>In Python the repeated actions are <strong>indented</strong> underneath the loop line. Indented = inside the box that repeats. Not indented = outside, runs once. Have students physically step <em>in</em> and <em>out</em> of a taped box to feel it.</p>
+    </div>
+
+    <div class="slabel">🌉 Bridge to Python</div>
+    <div class="code-label">for — once per item</div>
+    <div class="pycode">train = [<span class="s">"red"</span>, <span class="s">"blue"</span>, <span class="s">"green"</span>, <span class="s">"yellow"</span>]
+
+<span class="k">for</span> colour <span class="k">in</span> train:
+    <span class="b">print</span>(<span class="s">"Place a"</span>, colour, <span class="s">"brick"</span>)   <span class="c"># indented = the loop body</span></div>
+    <div class="code-label">while — until the condition changes</div>
+    <div class="pycode">steps = <span class="n">0</span>
+<span class="k">while</span> steps &lt; <span class="n">5</span>:
+    <span class="b">print</span>(<span class="s">"Step"</span>, steps)
+    steps = steps + <span class="n">1</span>          <span class="c"># this is what eventually stops the loop</span>
+
+<span class="b">print</span>(<span class="s">"Done walking."</span>)         <span class="c"># not indented — runs once, after the loop</span></div>
+    <div class="warn">Delete the <code>steps = steps + 1</code> line and run it (be ready to stop it with the keyboard interrupt). The class just <em>walked</em> this bug — they'll never forget what causes an infinite loop.</div>
+
+    <div class="chal">
+      <div class="chal-title">🔥 Extension Challenge</div>
+      <p>Nested loops, with bodies. "For each row (1 to 3), for each brick in the train, place one brick." One student walks the outer loop, a partner walks the inner loop and resets each time. They've physically performed a nested loop — the thing that builds grids, levels and game boards.</p>
+    </div>
+
+    <div class="slabel">✅ Lesson 4 Checklist</div>
+    <ul class="checklist">
+      <li>Students walked a for loop, doing the body once per item</li>
+      <li>Students walked a while loop, checking the condition before each pass</li>
+      <li>The class created — and felt — an infinite loop, then fixed it</li>
+      <li>Students can point to the loop body and explain why it's indented</li>
+      <li>Everyone has typed and run both a for loop and a while loop</li>
+    </ul>
+  </div>
+</article>
+
+<!-- ╔══════════════════════════════════╗ -->
+<!-- ║         LESSON  5               ║ -->
+<!-- ╚══════════════════════════════════╝ -->
+<article class="lesson l5" id="l5">
+  <div class="lesson-hdr" onclick="go(5)">
+    <div class="lnum">05</div>
+    <div class="ltxt">
+      <div class="ltag">Lesson 5 · Conditionals &amp; Decisions</div>
+      <div class="ltitle">The Decision Floor 🎲</div>
+      <div class="lsub">if / elif / else · Conditions · Comparison · Only one path runs</div>
+    </div>
+    <div class="lemoji">🎲</div>
+    <div class="lchev">▼</div>
+  </div>
+  <div class="lbody">
+    <div class="obj">
+      <strong>By the end of Lesson 5</strong> students will understand that a conditional <strong>chooses a path based on whether something is true</strong>, that <code>if</code> / <code>elif</code> / <code>else</code> are checked in order, and that <strong>exactly one path runs</strong>.
+    </div>
+
+    <div class="meta-row">
+      <span class="pill">⏱️ 50 min</span>
+      <span class="pill">👥 Whole class + pairs</span>
+      <span class="pill">🎲 Tape + dice</span>
+    </div>
+
+    <div class="kit">
+      <div class="kit-title">🎒 Kit for this lesson</div>
+      <ul>
+        <li>Masking tape to mark a branching path on the floor</li>
+        <li>One die per group</li>
+        <li>Signs: "FORWARD 3", "FORWARD 1", "STAY"</li>
+      </ul>
+    </div>
+
+    <div class="slabel">Part 1 — Build the Decision Floor</div>
+    <ul class="steps">
+      <li><div class="sc"><strong>Tape a fork</strong><span>Lay a path that splits into three branches. Put a sign at the start of each: <strong>roll == 6</strong>, <strong>roll &gt;= 4</strong>, and <strong>else</strong>.</span></div></li>
+      <li><div class="sc"><strong>Roll the condition</strong><span>A student rolls the die at the junction. The number is the <em>value being tested</em>.</span></div></li>
+      <li><div class="sc"><strong>Walk one branch only</strong><span>They check the signs <em>top to bottom</em>: is it 6? If not, is it 4+? If not, take the else branch. They walk <strong>one</strong> path — and the other two are not touched.</span></div></li>
+    </ul>
+
+    <div class="concept">
+      <div class="concept-title">🧠 Key Concept: Checked in order, one winner</div>
+      <p>Python tests <code>if</code> first, then each <code>elif</code> in order, and stops at the <em>first</em> true one. <code>else</code> is the "none of the above" path. A roll of 6 is also "4 or more" — but because <code>if</code> is checked first, the 6 branch wins. Order of the signs matters.</p>
+    </div>
+
+    <div class="slabel">Part 2 — Conditions Are True or False</div>
+    <ul class="steps">
+      <li><div class="sc"><strong>Say the condition out loud</strong><span>Before stepping, the walker states it as a yes/no question: "Is the roll equal to 6? <em>No.</em> Is the roll 4 or more? <em>Yes.</em>" Every condition collapses to true or false.</span></div></li>
+      <li><div class="sc"><strong>Reorder and break it</strong><span>Swap the <strong>roll &gt;= 4</strong> sign above the <strong>roll == 6</strong> sign. Now a 6 never reaches its own branch — it's caught early. Students <em>feel</em> why condition order is a real bug.</span></div></li>
+    </ul>
+    <div class="tip">Build a wall of comparison cards: <code>==</code> equals, <code>!=</code> not equal, <code>&gt;</code> greater than, <code>&gt;=</code> at least. Students hold up the card that matches each spoken question.</div>
+
+    <div class="slabel">🌉 Bridge to Python</div>
+    <div class="pycode"><span class="c"># The decision floor, written as a conditional.</span>
+roll = <span class="n">4</span>
+
+<span class="k">if</span> roll == <span class="n">6</span>:
+    <span class="b">print</span>(<span class="s">"Move forward 3 spaces"</span>)
+<span class="k">elif</span> roll &gt;= <span class="n">4</span>:
+    <span class="b">print</span>(<span class="s">"Move forward 1 space"</span>)
+<span class="k">else</span>:
+    <span class="b">print</span>(<span class="s">"Stay where you are"</span>)</div>
+    <div class="info">Change <code>roll</code> to 6, 5, 3 and 1 and re-run each time. Each value walks a different branch — and only ever one. The indented lines under each branch are that path, exactly like the taped floor.</div>
+
+    <div class="chal">
+      <div class="chal-title">🔥 Extension Challenge</div>
+      <p>Combine with Lesson 4: put a conditional <em>inside</em> a loop. "For each roll in a list of 10 rolls, decide the move." One student walks the loop, handing each roll to a partner standing on the decision floor. That nested structure is the core of almost every game's logic.</p>
+    </div>
+
+    <div class="slabel">✅ Lesson 5 Checklist</div>
+    <ul class="checklist">
+      <li>The class built a three-branch decision floor with conditions on signs</li>
+      <li>Students walked exactly one branch per roll, checking signs in order</li>
+      <li>Students saw a 6 get "caught early" when sign order was swapped</li>
+      <li>The class can read comparison operators as yes/no questions</li>
+      <li>Everyone has typed an if / elif / else and run it with different values</li>
+    </ul>
+  </div>
+</article>
+
+<!-- ╔══════════════════════════════════╗ -->
+<!-- ║         LESSON  6               ║ -->
+<!-- ╚══════════════════════════════════╝ -->
+<article class="lesson l6" id="l6">
+  <div class="lesson-hdr" onclick="go(6)">
+    <div class="lnum">06</div>
+    <div class="ltxt">
+      <div class="ltag">Lesson 6 · Functions &amp; Parameters</div>
+      <div class="ltitle">The Brick Machine ⚙️</div>
+      <div class="lsub">Reusable recipes · Parameters as inputs · Return values · Calling a function</div>
+    </div>
+    <div class="lemoji">⚙️</div>
+    <div class="lchev">▼</div>
+  </div>
+  <div class="lbody">
+    <div class="obj">
+      <strong>By the end of Lesson 6</strong> students will understand a function as a <strong>named, reusable recipe</strong>, that <strong>parameters</strong> are the inputs you hand it, and that a <strong>return value</strong> is what it hands back. This lesson ties together everything from Lessons 1–5.
+    </div>
+
+    <div class="meta-row">
+      <span class="pill">⏱️ 50 min</span>
+      <span class="pill">👥 Groups of 3</span>
+      <span class="pill">⚙️ Bricks + cups + baseplate</span>
+    </div>
+
+    <div class="kit">
+      <div class="kit-title">🎒 Kit for this lesson</div>
+      <ul>
+        <li>LEGO bricks of several colours</li>
+        <li>2 labelled cups per group (the parameters)</li>
+        <li>A baseplate (the build area)</li>
+        <li>An index card with the recipe written on it</li>
+      </ul>
+    </div>
+
+    <div class="slabel">Part 1 — Become the Machine</div>
+    <p style="color:var(--dim);font-size:0.88rem;line-height:1.7;margin-bottom:6px;">Groups of three take on a role each. The machine never decides anything — it just follows its recipe card with whatever inputs it's handed.</p>
+    <div class="two-col">
+      <div class="role-card">
+        <div class="rc-who">⚙️ The Machine</div>
+        <div class="rc-does">Holds the recipe card and follows it exactly. Takes whatever is in the input cups, builds, and hands back a result.</div>
+      </div>
+      <div class="role-card">
+        <div class="rc-who">📥 The Caller</div>
+        <div class="rc-does">Fills the input cups with chosen values, says "go", and waits for the machine to return something.</div>
+      </div>
+    </div>
+    <div class="role-card" style="margin-top:14px;">
+      <div class="rc-who">👀 The Checker</div>
+      <div class="rc-does">Confirms the machine only used the cups it was given — not bricks from elsewhere — and notes what was returned.</div>
+    </div>
+
+    <div class="slabel">Part 2 — Run the Recipe</div>
+    <ul class="steps">
+      <li><div class="sc"><strong>Write the recipe</strong><span>On the card: <em>"build_wall(colour, height): place a [colour] brick for each row from 0 up to height, then return the words 'wall finished'."</em> It reuses a loop from Lesson 4.</span></div></li>
+      <li><div class="sc"><strong>Call it</strong><span>The Caller puts a red brick in the <code>colour</code> cup and a "3" brick in the <code>height</code> cup, then says "build_wall, go!"</span></div></li>
+      <li><div class="sc"><strong>Return a value</strong><span>The Machine builds, then hands back a slip reading "wall finished". That handed-back slip is the <strong>return value</strong> — the Caller can use it or store it in a cup.</span></div></li>
+      <li><div class="sc"><strong>Call it again — differently</strong><span>Now blue, height 5. <em>Same machine, same recipe, new inputs, new result.</em> That reuse is the entire point of a function.</span></div></li>
+    </ul>
+
+    <div class="concept">
+      <div class="concept-title">🧠 Key Concept: Define once, call many times</div>
+      <p>A function is written <strong>once</strong> (the recipe card) and <strong>used many times</strong> with different inputs. The parameters are cups waiting to be filled by whoever calls it. <code>return</code> is the machine handing its result back out.</p>
+    </div>
+
+    <div class="slabel">🌉 Bridge to Python</div>
+    <div class="pycode"><span class="c"># Define the machine once...</span>
+<span class="k">def</span> <span class="b">build_wall</span>(colour, height):
+    <span class="k">for</span> row <span class="k">in</span> <span class="b">range</span>(height):
+        <span class="b">print</span>(<span class="s">"Place a"</span>, colour, <span class="s">"brick — row"</span>, row)
+    <span class="k">return</span> <span class="s">"wall finished"</span>
+
+<span class="c"># ...then call it as many times as you like.</span>
+result = <span class="b">build_wall</span>(<span class="s">"red"</span>, <span class="n">3</span>)     <span class="c"># hand the machine two inputs</span>
+<span class="b">print</span>(result)                      <span class="c"># -> wall finished</span>
+
+<span class="b">build_wall</span>(<span class="s">"blue"</span>, <span class="n">5</span>)            <span class="c"># same recipe, new inputs</span></div>
+    <div class="info">Map it back out loud: <code>def</code> is writing the recipe card, the names in brackets are the input cups, the indented lines are the recipe steps, and <code>return</code> is the slip handed back. Nothing here is new — it's Lessons 1–5 in a reusable box.</div>
+
+    <div class="chal">
+      <div class="chal-title">🔥 Extension Challenge</div>
+      <p>Have one machine <em>call another machine</em>. <code>build_tower</code> calls <code>build_wall</code> three times with different colours. Students physically pass cups between two machine-students. They've just discovered that programs are functions built out of functions — which is how every real piece of software is made.</p>
+    </div>
+
+    <div class="slabel">✅ Lesson 6 Checklist</div>
+    <ul class="checklist">
+      <li>Each group ran a "machine" that followed a fixed recipe card</li>
+      <li>Students filled parameter cups and saw the same function reused with new inputs</li>
+      <li>The class can explain what a return value is and where it goes</li>
+      <li>Students connected def / parameters / return to the physical roles</li>
+      <li>Everyone has typed, called, and reused a Python function</li>
+    </ul>
+
+    <div class="win-box">
+      <div style="font-size:3rem;margin-bottom:10px;">🎓</div>
+      <div style="font-family:'Fredoka One',cursive;font-size:2rem;color:var(--teal2);margin-bottom:10px;">Hands → Code</div>
+      <p style="color:var(--dim);font-size:0.92rem;line-height:1.8;max-width:520px;margin:0 auto;">Your students have now <em>physically performed</em> sequencing, variables, lists, loops, conditionals and functions — and seen the exact Python for each. Those six ideas are the whole foundation. Everything else in programming is a combination of things their hands already understand.</p>
+    </div>
+  </div>
+</article>
+
+</main>
+
+<footer>
+  <p>🧱 Hands-On Python · Kinesthetic Coding Guide · Year 7 Computer Science · A companion to the <a href="index.html" style="color:var(--teal2);text-decoration:none;font-weight:700;">Scratch Game Academy</a></p>
+  <p style="margin-top:8px;">© Copyright 2026 — Designed and Created by <strong style="color:var(--teal);">Dr Galan</strong> for <a href="https://coderra.je" target="_blank" style="color:var(--teal2);text-decoration:none;font-weight:700;">Coderra.je</a></p>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
