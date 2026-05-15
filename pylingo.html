@@ -130,6 +130,7 @@
 
   .nodes { display: flex; flex-direction: column; align-items: center; gap: 8px; padding-top: 6px; }
   .node-row { display: flex; flex-direction: column; align-items: center; position: relative; }
+  .node-row.has-bubble { margin-top: 36px; }
 
   .node {
     width: 74px; height: 74px;
@@ -680,13 +681,10 @@ function flatLessons() {
   return out;
 }
 function lessonState(lessonId) {
-  const flat = flatLessons();
-  const idx = flat.findIndex(f => f.lesson.id === lessonId);
   if (state.completed[lessonId]) return "done";
-  // first non-completed unlocked lesson is "current"
-  for (let i = 0; i < flat.length; i++) {
-    if (!state.completed[flat[i].lesson.id]) {
-      return flat[i].lesson.id === lessonId ? "current" : (i < idx ? "current" : "locked");
+  for (const f of flatLessons()) {
+    if (!state.completed[f.lesson.id]) {
+      return f.lesson.id === lessonId ? "current" : "locked";
     }
   }
   return "locked";
@@ -732,6 +730,7 @@ function renderMap() {
       if (li > 0) nodes.appendChild(el("div", "connector"));
 
       if (st === "current") {
+        row.classList.add("has-bubble");
         row.appendChild(el("div", "start-bubble", "START"));
       }
 
