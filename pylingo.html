@@ -30,6 +30,12 @@
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
+  img.emoji {
+    height: 1em; width: 1em;
+    margin: 0 .04em;
+    vertical-align: -.1em;
+  }
+
   body {
     font-family: 'Nunito', system-ui, sans-serif;
     background: var(--grey-bg);
@@ -402,8 +408,15 @@
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@twemoji/api@latest/dist/twemoji.min.js" crossorigin="anonymous"></script>
 <script>
 "use strict";
+
+function tw(node) {
+  if (window.twemoji && node) {
+    window.twemoji.parse(node, { folder: "svg", ext: ".svg" });
+  }
+}
 
 /* ===================== COURSE CONTENT ===================== */
 const COURSE = [
@@ -753,6 +766,7 @@ function renderMap() {
     });
     path.appendChild(nodes);
   });
+  tw(document.body);
 }
 
 /* ===================== LESSON SESSION ===================== */
@@ -793,6 +807,7 @@ function renderHearts() {
   for (let i = 0; i < HEARTS_PER_LESSON; i++) {
     wrap.appendChild(el("span", "h" + (i < session.hearts ? "" : " empty"), "❤️"));
   }
+  tw(wrap);
 }
 function renderProgress() {
   const pct = (session.correctCount / session.total) * 100;
@@ -818,6 +833,7 @@ function renderExercise() {
   else renderBuild(ex, area);
 
   renderFooterCheck();
+  tw(area);
 }
 
 function renderMC(ex, area) {
@@ -1000,6 +1016,7 @@ function renderFooterFeedback(correct, ex) {
   btn.id = "continueBtn";
   btn.addEventListener("click", continueLesson);
   f.appendChild(btn);
+  tw(f);
 }
 
 function continueLesson() {
@@ -1058,6 +1075,7 @@ function showCompleteScreen(earned, perfect, replay) {
   inner.appendChild(actions);
 
   showScreen("completeScreen");
+  tw(inner);
   launchConfetti(document.getElementById("completeScreen").firstElementChild);
 }
 
@@ -1123,6 +1141,7 @@ document.getElementById("resetBtn").addEventListener("click", () => {
 loadState();
 renderMap();
 showScreen("mapScreen");
+window.addEventListener("load", () => tw(document.body));
 </script>
 </body>
 </html>
